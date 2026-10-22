@@ -19,16 +19,18 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ---
 
+
 ## 2. Tarika Subhash Hedaoo
 
 ### Contributions in Milestone 1
 
-- Gathered the existing dataset.
-- Created milestone-1 presentation.
 - Defined the project's primary objective.
+- Gathered the existing dataset.
 - Identified the need of creating our own fake speech dataset.
+- Created milestone-1 presentation.
 
 ---
+
 
 ## 3. PAL AMITKUMAR SHISH
 
@@ -36,10 +38,11 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ---
 
+
 ## 4. Vikram Singh Negi
 
-### Contributions in Milestone 1
-
+### Contributions in Milestone 1 
+ 
 - Narrowed down and refined the problem statement.
 - Identified past research papers relevant to project.
 - Created project architecture diagram and other illustrations.
