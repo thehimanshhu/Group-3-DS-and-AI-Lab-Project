@@ -23,7 +23,7 @@
 
 ## Vikram Singh Negi (@lostvikx)
 
-- Created GitHub repository with branches.
+- Created project architecture diagram.
 - Narrowed down and refined the problem statement.
 - Identified past research papers relevant to project.
 - Performed detailed literature review by comparing existing works.
