@@ -6,7 +6,7 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ---
 
-## 1. Himanshu Saini 
+## 1. Himanshu Saini
 
 ### Contributions in Milestone 1
 
@@ -22,7 +22,6 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ## 2. Tarika Subhash Hedaoo
 
-
 ### Contributions in Milestone 1
 
 - Defined the project's primary objective.
@@ -35,16 +34,16 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ## 3. PAL AMITKUMAR SHISH
 
-
 ### Contributions in Milestone 1
-
-
-
 
 ---
 
 
 ## 4. Vikram Singh Negi
 
-
-### Contributions in Milestone 1
+### Contributions in Milestone 1 
+ 
+- Narrowed down and refined the problem statement.
+- Identified past research papers relevant to project.
+- Created project architecture diagram and other illustrations.
+- Performed detailed literature review by comparing existing works.
