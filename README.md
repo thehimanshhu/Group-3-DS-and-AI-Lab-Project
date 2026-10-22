@@ -19,22 +19,22 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 
 ```
 ├── README.md
-├── docs/               # Project documentation
+├── LICENSE                  # MIT licence
+├── acknowledgement.md       # Signed acknowledgement of contributions
+├── assets/
+│   └── signatures/          # Member signatures (<roll no>.jpg)
 ├── milestones/
-│   └── milestone-1/
-│       ├── milestone-1.md   # Problem definition & literature review
+│   └── Milestone-1/
+│       ├── Milestone-1.md   # Problem definition & literature review
 │       └── worklog.md       # Contributions of each member
-├── data/               # Data scripts (download, generation, splits)
-├── notebooks/          # Training and inference notebooks
-├── src/                # Model, training and evaluation code
-└── app/                # Gradio app and Telegram bot
+└── scratchpad/              # Personal working notes of each member
 ```
 
 ## Milestones
 
 | # | Milestone | Due | Status |
 | --- | --- | --- | --- |
-| 1 | [Problem definition & literature review] | 22 Oct | In progress |
+| 1 | Problem definition & literature review | 22 Oct | In progress |
 | 2 | Dataset preparation | 29 Oct | Planned |
 | 3 | Model architecture | 5 Nov | Planned |
 | 4 | Model training | 19 Nov | Planned |
@@ -43,12 +43,12 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 
 ## Team
 
-| # | Member |
-| --- | --- |
-| 1 | Tarika Subhash Hedaoo |
-| 2 | Himanshu Saini |
-| 3 | PAL AMITKUMAR SHISH |
-| 4 | Vikram Singh Negi |
+| # | Member | Roll No. | Signature |
+| --- | --- | --- | --- |
+| 1 | Himanshu Saini | 22f3002094 | <img src="assets/signatures/22f3002094.jpg" alt="H.S" height="40"> |
+| 2 | Pal Amitkumar Shish | 21f1006870 | <img src="assets/signatures/21f1006870.jpg" alt="P.A.S" height="40"> |
+| 3 | Tarika Subhash Hedaoo | 22f3002758 | <img src="assets/signatures/22f3002758.jpg" alt="T.S.H" height="40"> |
+| 4 | Vikram Singh Negi | 22f3001905 | <img src="assets/signatures/22f3001905.jpg" alt="V.S.N" height="40"> |
 
 ## Licences
 
