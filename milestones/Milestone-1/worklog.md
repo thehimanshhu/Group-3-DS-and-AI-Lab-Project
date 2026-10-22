@@ -36,6 +36,10 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ### Contributions in Milestone 1
 
+- Researched existing approaches, including AASIST, ASVspoof, and XLS-R.
+- Explored potential datasets and XLS-R fine-tuning for multilingual deepfake voice detection.
+- Investigated the integration of bot with the proposed deepfake voice detection system.
+
 ---
 
 
