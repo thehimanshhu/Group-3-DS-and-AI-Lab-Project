@@ -19,15 +19,15 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 
 ```
 ├── README.md
-├── docs/               # Project documentation
+├── LICENSE                  # MIT licence
+├── acknowledgement.md       # Signed acknowledgement of contributions
+├── assets/
+│   └── signatures/          # Member signatures (<roll no>.jpg)
 ├── milestones/
-│   └── milestone-1/
-│       ├── milestone-1.md   # Problem definition & literature review
+│   └── Milestone-1/
+│       ├── Milestone-1.md   # Problem definition & literature review
 │       └── worklog.md       # Contributions of each member
-├── data/               # Data scripts (download, generation, splits)
-├── notebooks/          # Training and inference notebooks
-├── src/                # Model, training and evaluation code
-└── app/                # Gradio app and Telegram bot
+└── scratchpad/              # Personal working notes of each member
 ```
 
 ## Milestones
