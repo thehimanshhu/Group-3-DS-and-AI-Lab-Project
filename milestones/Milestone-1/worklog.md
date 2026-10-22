@@ -6,7 +6,7 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ---
 
-## 1. Himanshu Saini 
+## 1. Himanshu Saini
 
 ### Contributions in Milestone 1
 
@@ -23,6 +23,10 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ### Contributions in Milestone 1
 
+- Gathered the existing dataset.
+- Created milestone-1 presentation.
+- Defined the project's primary objective.
+- Identified the need of creating our own fake speech dataset.
 
 ---
 
@@ -30,10 +34,13 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ### Contributions in Milestone 1
 
-
 ---
 
 ## 4. Vikram Singh Negi
 
 ### Contributions in Milestone 1
 
+- Narrowed down and refined the problem statement.
+- Identified past research papers relevant to project.
+- Created project architecture diagram and other illustrations.
+- Performed detailed literature review by comparing existing works.
