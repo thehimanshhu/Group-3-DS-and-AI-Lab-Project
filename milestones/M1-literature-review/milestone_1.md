@@ -74,9 +74,9 @@ Here are the cases and reports we found, newest first, followed by the surveys a
 - Full production deployment for a telecom operator or bank.
 
 <div align="center">
-  <img src="assets/problem_scope.png" alt="Figure 1: Problem and system scope — the cloned-voice threat, the detection and explainability pipeline, and the in-scope / out-of-scope boundaries" width="800">
+  <img src="assets/problem_scope.png" alt="Figure 1: Problem and system scope — the cloned-voice threat, the detection and explainability pipeline, and the in-scope / out-of-scope boundaries." width="800">
   <br>
-  <em>Figure 1: Problem and system scope — the cloned-voice threat, the detection and explainability pipeline, and the in-scope / out-of-scope boundaries</em>
+  <em>Figure 1: Problem and system scope — the cloned-voice threat, the detection and explainability pipeline, and the in-scope / out-of-scope boundaries.</em>
 </div>
 
 ---
@@ -116,9 +116,9 @@ The following objectives are measurable and directly aligned with the problem de
 6. **Deliver a working prototype** that accepts an audio clip and returns (a) a real / AI-generated verdict, (b) a confidence score and (c) the saliency view, within **5 seconds for a 10-second clip** on a free CPU instance. It should be accessible through a web app and a Telegram bot.
 
 <div align="center">
-  <img src="assets/measurable_objectives.png" alt="Figure 2: Measurable objectives and the four out-of-distribution generalisation stress tests" width="800">
+  <img src="assets/measurable_objectives.png" alt="Figure 2: Measurable objectives and the four out-of-distribution generalisation stress tests." width="800">
   <br>
-  <em>Figure 2: Measurable objectives and the four out-of-distribution generalisation stress tests</em>
+  <em>Figure 2: Measurable objectives and the four out-of-distribution generalisation stress tests.</em>
 </div>
 
 ---
@@ -128,9 +128,9 @@ The following objectives are measurable and directly aligned with the problem de
 This section reviews academic research, benchmarks and tools for detecting AI-generated speech (also called **spoofing countermeasures** or **anti-spoofing**), highlighting their strengths and weaknesses.
 
 <div align="center">
-  <img src="assets/literature_review.png" alt="ProFigure 3: Evolution of anti-spoofing approaches and the resulting gap analysis, from classical GMM baselines to the proposed system" width="800">
+  <img src="assets/literature_review.png" alt="ProFigure 3: Evolution of anti-spoofing approaches and the resulting gap analysis, from classical GMM baselines to the proposed system." width="800">
   <br>
-  <em>Figure 3: Evolution of anti-spoofing approaches and the resulting gap analysis, from classical GMM baselines to the proposed system</em>
+  <em>Figure 3: Evolution of anti-spoofing approaches and the resulting gap analysis, from classical GMM baselines to the proposed system.</em>
 </div>
 
 ### 5.1 Existing Approaches
@@ -357,9 +357,9 @@ Based on the literature review, the following key gaps exist in current solution
 | **Web app + Telegram bot**                                   | Makes detection available in a messaging app, where users can simply forward a suspicious voice note.                                      |
 
 <div align="center">
-  <img src="assets/model_architecture.png" alt="Figure 4: Multilingual dataset construction and the proposed model architecture, with the fine-tuned XLS-R encoder and dual output heads" width="800">
+  <img src="assets/model_architecture.png" alt="Figure 4: Multilingual dataset construction and the proposed model architecture, with the fine-tuned XLS-R encoder and dual output heads." width="800">
   <br>
-  <em>Figure 4: Multilingual dataset construction and the proposed model architecture, with the fine-tuned XLS-R encoder and dual output heads</em>
+  <em>Figure 4: Multilingual dataset construction and the proposed model architecture, with the fine-tuned XLS-R encoder and dual output heads.</em>
 </div>
 
 ### 6.3 Key Differences from Existing Systems
