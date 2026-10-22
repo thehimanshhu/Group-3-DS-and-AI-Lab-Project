@@ -1,21 +1,14 @@
 # Problem Statement
 
-> Project Title: Deepfake Voice and Scam Detection Using Deep Learning
+Generative AI can now copy a human voice from a few seconds of audio. Open-source voice-cloning models such as XTTS-v2 (Casanova et al., 2024) advertise cloning a voice from "just a 6-second audio clip", and they run on a free GPU. The resulting speech sounds natural, carries the speaker's accent and tone, and is very hard for a listener to tell apart from the real person.
 
-AI-generated voices are making phone and voice-message scams harder to spot, especially in multilingual regions like India. Most people cannot tell a cloned voice from a real one, and manual verification is unreliable.
+This technology has useful applications, but it is also being misused. Cloned voices are used to:
 
-This project aims to build an end-to-end system that detects AI-generated speech and flags likely scams by analyzing both the audio and its spoken content.
+- Impersonate family members in "emergency" calls asking for money
+- Pose as bank officials, police officers or company executives
+- Spread fake audio clips of public figures
+- Bypass voice-based identity checks
 
-Given an audio clip with:
+In India, these calls and voice notes arrive in Hindi, Tamil, Telugu and many other languages, not only English. However, almost all published deepfake voice detectors are trained and tested on English speech. Their reliability on Indian languages, on newer voice-generation systems and on low-quality phone audio is largely unknown.
 
-* Speech in English, Hindi, Tamil or Telugu
-* Any length, recorded or uploaded
-* Clean or phone-quality sound
-
-The system must:
-
-* Predict the probability that the clip is AI-generated
-* Highlight the audio segments that influenced the decision
-* Stay reliable on languages and voice generators not seen during training
-
-The system also gives a scam verdict, and users can check suspicious calls and voice messages through a simple web app and Telegram bot. Beyond binary classification, it tests how well detection holds up across languages, unseen generators and real-world conditions.
+There is a strong need for an accurate, multilingual and explainable AI system that can tell whether a voice is real or AI-generated.
