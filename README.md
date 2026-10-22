@@ -34,7 +34,7 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 
 | # | Milestone | Due | Status |
 | --- | --- | --- | --- |
-| 1 | [Problem definition & literature review] | 22 Oct | In progress |
+| 1 | Problem definition & literature review | 22 Oct | In progress |
 | 2 | Dataset preparation | 29 Oct | Planned |
 | 3 | Model architecture | 5 Nov | Planned |
 | 4 | Model training | 19 Nov | Planned |
