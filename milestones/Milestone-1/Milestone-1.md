@@ -34,23 +34,7 @@ The system must:
 
 **Primary objective.** The project is a **real vs AI-generated voice classifier**. It does **not** try to decide whether a call is a scam. Deciding that would require understanding the content and intent of a conversation, which is a separate problem. Voice-cloning scams are the **motivation** for the project, as a real-world case where knowing that a voice is synthetic is valuable. The detector itself judges only the voice, not what is being said.
 
-### 1.2 Current Status of Deepfake Voice Scams
-
-Here are the cases and reports we found, newest first, followed by the surveys and trend reports.
-
-#### 1.2.1 Individual case reports
-
-- Mumbai senior citizen, 69, loses ₹50 lakh in an AI voice-cloning scam where the caller mimicked a respected community figure (Oct 2026) [[Report](https://www.freepressjournal.in/mumbai/mumbai-cyber-fraud-69-year-old-senior-citizen-loses-50-lakh-in-ai-voice-cloning-scam)]
-- Indore resident loses ₹1.83 lakh after an AI-generated voice posed as his brother-in-law in Sydney, claiming he faced jail over an expired visa (Jul 2026) [[Report](https://incidentdatabase.ai/cite/1566/)]
-- Indore play school owner loses ₹97,500, her savings and teachers' salary money, to a cloned voice of her police-officer cousin; police call it Madhya Pradesh's first such case (Jan 2026) [[Report](https://incidentdatabase.ai/reports/7000/)]
-- Powai businessman loses ₹80,000 after fraudsters played his son's cloned voice pleading for bail, posing as the Indian Embassy in Dubai (2024) [[Report](https://incidentdatabase.ai/reports/5140)]
-- Delhi and Noida parents get calls with cloned "child's voice" crying for help, one threatening a false rape case against an MBA student [[Report](https://www.tabla.com.sg/news/india/scammers-use-ai-to-clone-kids-voices)]
-
-#### 1.2.2 Surveys and trend reports
-
-- McAfee report finds 83% of Indian AI voice-scam victims lost money, and 69% of Indians can't tell a cloned voice from a real one [[Report](https://www.boomlive.in/amp/explainers/ai-voice-scam-voice-cloning-mcafee-report-21851)]
-- About 47% of Indian adults have experienced or know someone who experienced an AI voice scam; tools can clone a voice from three seconds of audio [[Report](https://businessworld.in/article/ai-voice-scams-more-prevalent-in-india-affects-almost-50-indians-mcafee-report-475192)]
-- Aggregator summary reports a 450% rise in voice-cloning fraud complaints to Haryana's cyber cell in Q4 2025, and ₹22,846 crore in cyber-fraud losses in 2024 [[Report](https://threatcluster.io/cluster/ai-voice-cloning-scams-surge-in-india-124ab5b6)]
+---
 
 ## 2. Scope and Boundaries
 
