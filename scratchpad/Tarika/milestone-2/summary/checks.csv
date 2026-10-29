@@ -1,0 +1,18 @@
+check,result,ok
+Expected clips (sentences.csv),6480,yes
+Clips in manifests,6480,yes
+Missing clips,0,yes
+Unexpected clips,0,yes
+Duplicate clip_id,0,yes
+Failed clips (no audio),0,yes
+Duplicate audio files (same sha1),0,yes
+Missing manifest columns,none,yes
+Empty values in required columns,0,yes
+Clips whose text/language/generator differ from sentences.csv,0,yes
+Sentences spoken by all 3 generators,2160 of 2160,yes
+One sample rate per generator,"indic-parler-tts: 44100 Hz, indicf5: 24000 Hz, mms-tts: 16000 Hz",yes
+Labels,fake,yes
+Splits,test,yes
+Clips flagged silent,1,yes
+Clips flagged too short,0,yes
+Clips with > 1% clipped samples,0,yes
