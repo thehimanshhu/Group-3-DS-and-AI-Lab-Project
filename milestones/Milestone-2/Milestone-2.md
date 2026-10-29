@@ -163,6 +163,8 @@ Full details: [`InTheWild_report.md`](InTheWild_report.md).
 
 Each language has 720 sentences, and every sentence is spoken by all three generators (2,160 clips per language). How the set was made, and why, is described in Section 6.
 
+Full details: [`GeneratedSet_EDA_notebook.ipynb`](../../notebooks/Milestone-2/GeneratedSet_EDA_notebook.ipynb), with data checks, voices, duration, speaking rate, loudness, IndicF5's pace per reference voice and listening examples of the same sentence from all three generators.
+
 <div align="center">
   <img src="../../assets/infographics/Milestone-2/generated_voice_gender.png" alt="Figure 5: Voice gender in the generated set. IndicF5 and Parler are balanced except Parler Tamil (2:1 female); MMS-TTS has one voice whose gender is not stated." width="800">
   <br>
@@ -277,7 +279,7 @@ IndicSynth covers only two generators (XTTS-v2 and FreeVC24). To measure how the
    - Any sentence that also appears in Kathbath's train, valid or test_known split is removed.
    - Only sentences of 6–18 words are kept. From the remaining pool (1,492–1,925 sentences per language), 720 are drawn at random per language.
    - The list is fixed (MD5 `ad1f2223…`), and the notebook rebuilds it from AI4Bharat's transcript archive and checks this hash on every run.
-2. **Generation** (`generate_fakes_kaggle.ipynb`):
+2. **Generation** (`generate_fakes_kaggle.ipynb`; the executed notebooks of the three full runs are kept as [`generate_fakes_parler_run.ipynb`](../../notebooks/Milestone-2/generate_fakes_parler_run.ipynb), [`generate_fakes_indicf5_run.ipynb`](../../notebooks/Milestone-2/generate_fakes_indicf5_run.ipynb) and [`generate_fakes_mms_run.ipynb`](../../notebooks/Milestone-2/generate_fakes_mms_run.ipynb)):
    - Runs on Kaggle with two T4 GPUs, with the clips split evenly between the GPUs.
    - Each clip has a fixed seed (42 + its position) and is saved as FLAC at the generator's native rate, without resampling.
    - Clips are uploaded in batches of 50 to a private Hugging Face dataset, together with a JSON-lines manifest. A run that stops can be restarted and skips finished clips.
@@ -486,6 +488,8 @@ The classifier uses only audio and a label, so transcripts are not needed for tr
 | In-the-Wild EDA | [`InTheWild_notebook.ipynb`](../../notebooks/Milestone-2/InTheWild_notebook.ipynb) | Colab / Kaggle CPU | revision `eee168f9`, seed 42 |
 | Sentence selection | [`select_sentences.py`](../../scratchpad/Tarika/milestone-2/select_sentences.py) | any | seed 42; output MD5 `ad1f2223…` |
 | Generation | [`generate_fakes_kaggle.ipynb`](../../notebooks/Milestone-2/generate_fakes_kaggle.ipynb) | Kaggle, 2 × T4 | seed 42 + clip index; one generator per run |
+| Generation runs (executed) | [`parler`](../../notebooks/Milestone-2/generate_fakes_parler_run.ipynb), [`indicf5`](../../notebooks/Milestone-2/generate_fakes_indicf5_run.ipynb), [`mms`](../../notebooks/Milestone-2/generate_fakes_mms_run.ipynb) | Kaggle, 2 × T4 | outputs of the three full runs |
+| Generated-set EDA | [`GeneratedSet_EDA_notebook.ipynb`](../../notebooks/Milestone-2/GeneratedSet_EDA_notebook.ipynb) | any CPU (Hugging Face token needed) | reads the manifests; seed 42 |
 | Generated-set checks | [`summarize_dataset.py`](../../scratchpad/Tarika/milestone-2/summarize_dataset.py) | any | reads the manifests |
 | Preprocessing | [`preprocess.py`](../../scratchpad/himanshu/milestone-2/preprocess.py) | any | fixed parameters; deterministic output hash |
 

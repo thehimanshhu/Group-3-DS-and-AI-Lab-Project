@@ -22,7 +22,7 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 - Built the pipeline for our own generated dataset (Indic Parler-TTS, IndicF5, MMS-TTS): sentence selection from Kathbath's test split, the Kaggle generation notebook, quality checks and reproducibility checks.
 - Generated and verified the full set of 6,480 clips (11.25 hours) on Kaggle and stored it on Hugging Face.
-- Performed the EDA of the generated set with a summary script, tables and figures.
+- Performed the EDA of the generated set (EDA notebook and summary script, with tables, figures and listening examples).
 
 ---
 
