@@ -1,0 +1,37 @@
+# Team Contribution Tracker — Milestone 1
+
+**Project:** Deepfake Voice Detection for Indian Languages
+
+This document tracks the work completed and responsibilities assigned for Milestone 1.
+
+---
+
+## 1. Himanshu Saini
+
+### Contributions in Milestone 1
+
+-
+
+---
+
+## 2. Tarika Subhash Hedaoo
+
+### Contributions in Milestone 1
+
+-
+
+---
+
+## 3. Pal Amitkumar Shish
+
+### Contributions in Milestone 1
+
+-
+
+---
+
+## 4. Vikram Singh Negi
+
+### Contributions in Milestone 1
+
+-
