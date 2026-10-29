@@ -22,11 +22,18 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 ├── LICENSE                  # MIT licence
 ├── acknowledgement.md       # Signed acknowledgement of contributions
 ├── assets/
+│   ├── infographics/        # Figures used in the milestone reports
 │   └── signatures/          # Member signatures (<roll no>.jpg)
 ├── milestones/
-│   └── Milestone-1/
-│       ├── Milestone-1.md   # Problem definition & literature review
-│       └── worklog.md       # Contributions of each member
+│   ├── Milestone-1/
+│   │   ├── Milestone-1.md   # Problem definition & literature review
+│   │   └── worklog.md       # Contributions of each member
+│   └── Milestone-2/
+│       ├── Milestone-2.md   # Dataset identification & preparation
+│       ├── worklog.md
+│       └── ...              # Per-dataset EDA reports and figures
+├── notebooks/
+│   └── Milestone-2/         # EDA notebooks, generation pipeline, preprocessing
 └── scratchpad/              # Personal working notes of each member
 ```
 
@@ -35,7 +42,7 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 | # | Milestone | Due | Status |
 | --- | --- | --- | --- |
 | 1 | Problem definition & literature review | 22 Oct | Done |
-| 2 | Dataset preparation | 29 Oct | Planned |
+| 2 | Dataset preparation | 29 Oct | Done |
 | 3 | Model architecture | 5 Nov | Planned |
 | 4 | Model training | 19 Nov | Planned |
 | 5 | Evaluation & analysis | 26 Nov | Planned |
