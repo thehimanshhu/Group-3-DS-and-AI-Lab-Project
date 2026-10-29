@@ -1,0 +1,45 @@
+generator,lang,voice_id,voice_gender,clips
+Indic Parler-TTS,Hindi,parler-divya,f,180
+Indic Parler-TTS,Hindi,parler-rohit,m,180
+Indic Parler-TTS,Hindi,parler-unnamed-f,f,180
+Indic Parler-TTS,Hindi,parler-unnamed-m,m,180
+Indic Parler-TTS,Tamil,parler-jaya,f,240
+Indic Parler-TTS,Tamil,parler-unnamed-f,f,240
+Indic Parler-TTS,Tamil,parler-unnamed-m,m,240
+Indic Parler-TTS,Telugu,parler-lalitha,f,180
+Indic Parler-TTS,Telugu,parler-prakash,m,180
+Indic Parler-TTS,Telugu,parler-unnamed-f,f,180
+Indic Parler-TTS,Telugu,parler-unnamed-m,m,180
+IndicF5,Hindi,ivr-S4256820200338001,f,72
+IndicF5,Hindi,ivr-S4256942400332561,f,72
+IndicF5,Hindi,ivr-S4257120600367211,f,72
+IndicF5,Hindi,ivr-S4257196900365559,m,72
+IndicF5,Hindi,ivr-S4257878300397507,f,72
+IndicF5,Hindi,ivr-S4258354000329548,m,72
+IndicF5,Hindi,ivr-S4258388600389373,m,72
+IndicF5,Hindi,ivr-S4258486700370849,m,72
+IndicF5,Hindi,ivr-S4258561600395718,f,72
+IndicF5,Hindi,ivr-S4258858600387188,m,72
+IndicF5,Tamil,ivr-S4256620800339114,m,72
+IndicF5,Tamil,ivr-S4256700400339825,f,72
+IndicF5,Tamil,ivr-S4256730700334621,f,72
+IndicF5,Tamil,ivr-S4256817200333561,f,72
+IndicF5,Tamil,ivr-S4257156700348229,f,72
+IndicF5,Tamil,ivr-S4257394700369395,f,72
+IndicF5,Tamil,ivr-S4258842100383591,m,72
+IndicF5,Tamil,ivr-S4259410500335240,m,72
+IndicF5,Tamil,ivr-S4259519400365771,m,72
+IndicF5,Tamil,ivr-S4259592300370250,m,72
+IndicF5,Telugu,ivr-S4256002300334350,m,72
+IndicF5,Telugu,ivr-S4256004500332662,m,72
+IndicF5,Telugu,ivr-S4256021800330914,m,72
+IndicF5,Telugu,ivr-S4256036600335426,f,72
+IndicF5,Telugu,ivr-S4257679000359335,f,72
+IndicF5,Telugu,ivr-S4257970400395219,f,72
+IndicF5,Telugu,ivr-S4258241700338477,m,72
+IndicF5,Telugu,ivr-S4259164200355294,f,72
+IndicF5,Telugu,ivr-S4259385700302647,f,72
+IndicF5,Telugu,ivr-S4259410400337776,m,72
+MMS-TTS,Hindi,mms-hi,unknown,720
+MMS-TTS,Tamil,mms-ta,unknown,720
+MMS-TTS,Telugu,mms-te,unknown,720

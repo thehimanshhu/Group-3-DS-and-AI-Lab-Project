@@ -1,0 +1,4 @@
+language,sentences,kathbath_speakers,words_min,words_median,words_max,female_reader_share
+Hindi,720,20,8,12.0,16,0.5
+Tamil,720,20,6,10.0,15,0.57
+Telugu,720,20,8,10.0,15,0.51
