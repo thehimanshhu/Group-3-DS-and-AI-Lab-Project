@@ -34,4 +34,7 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ### Contributions in Milestone 1
 
--
+- Performed Exploratory Data Analysis (EDA) on 2 identified datasets: ASVspoof & In-the-Wild.
+- Found insights on the mentioned datasets and performed data visualization.
+- Created a report for each EDA with plots and tables to summarize conclusions.
+- Ideated data augmentation techniques that can be applied for preprocessing step.
