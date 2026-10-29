@@ -198,7 +198,6 @@ Each language has 720 sentences, and every sentence is spoken by all three gener
   <em>Figure 7: Speaking rate of the generated clips. All three generators speak Hindi at about 2.4 words per second; in Tamil and Telugu Parler and MMS-TTS are slower, while IndicF5 Tamil copies the fast pace of its reference speakers.</em>
 </div>
 
-
 <div align="center">
   <img src="../../assets/infographics/Milestone-2/generated_voice_gender.png" alt="Figure 8: Voice gender in the generated set. IndicF5 and Parler are balanced except Parler Tamil (2:1 female); MMS-TTS has one voice whose gender is not stated." width="800">
   <br>
@@ -278,7 +277,7 @@ Kathbath is used only in its **clean** version, so the background noise of the r
 | Gender balance | ⚠️ Uneven | IndicSynth Tamil 23% female, Kathbath records 58–75% female; handled by gender-balanced sampling |
 | Label quality | ✅ Good | Labels come from how each clip was made (recorded or generated), not from annotators |
 
-The volume is far larger than needed. Following the plan from Milestone 1, training uses a seeded, gender-balanced sample: about 6,000 Kathbath clips per language and about 3,000 IndicSynth clips per generator and language. The two weak spots are the small number of Indian-language generators in training (two) and the lack of phone-channel audio. The first is why the generated set exists; the second is covered by augmentation.
+The volume is far larger than needed. Following our data plan, training uses a seeded, gender-balanced sample: about 6,000 Kathbath clips per language and about 3,000 IndicSynth clips per generator and language. The two weak spots are the small number of Indian-language generators in training (two) and the lack of phone-channel audio. The first is why the generated set exists; the second is covered by augmentation.
 
 ### 5.2 Augmentation Plan (applied during training, to both classes)
 
@@ -398,7 +397,7 @@ In-the-Wild stays test-only. Its speaker-disjoint 80/10/10 split ([`InTheWild_re
 | Check | Result |
 | --- | --- |
 | Speakers shared between splits (IndicSynth + Kathbath, simulated split) | 0 in every language |
-| FreeVC24 clips whose two speakers fall in different splits | 47% of FreeVC24 clips are dropped; 42k–69k per language remain for training and 1,500–3,000 for validation and test |
+| FreeVC24 clips whose two speakers fall in different splits | 47% of FreeVC24 clips are dropped; 42k–69k per language remain for training and 1,500–3,060 per split for validation and test |
 | IndicSynth reference recordings | All are Kathbath training recordings of the same speaker, so a reference always sits in the same split as its fakes |
 | Generated set vs. training text | Sentences only from Kathbath test speakers; no sentence also appears in train, valid or test_known. The 8 Hindi sentences shared by IndicSynth and Kathbath's test split are among those excluded |
 | Kathbath validation speakers | All 20 per language also in train, so handled by the speaker-level split instead of Kathbath's own split |
@@ -482,7 +481,7 @@ Every output has the same rate, format and level, the edge silence is removed, a
 
 ### 9.2 Preparation Order
 
-1. Download each source at its pinned revision (`kathbath`, IndicSynth row groups, ASVspoof, In-the-Wild, our generated set).
+1. Download each source at its pinned revision (Kathbath, IndicSynth row groups, ASVspoof, In-the-Wild, our generated set).
 2. Draw the seeded, gender-balanced training samples (Section 5.1) and keep every test clip.
 3. Assign splits by speaker (Section 7).
 4. Run `preprocess.py` on every selected clip and write one row per clip to the manifest (Section 8.2).
@@ -526,7 +525,7 @@ The classifier uses only audio and a label, so transcripts are not needed for tr
 
 | Step | File | Runs on | Fixed inputs |
 | --- | --- | --- | --- |
-| Kathbath EDA | [`kathbath_eda.ipynb`](../../scratchpad/amit/milestone-2/kathbath_eda.ipynb) | Hugging Face streaming | seed 42 |
+| Kathbath EDA | [`kathbath_eda.ipynb`](../../scratchpad/amit/milestone-2/kathbath_eda.ipynb) | Hugging Face `datasets` | seed 42 |
 | IndicSynth EDA | [`IndicSynth_notebook.ipynb`](../../notebooks/Milestone-2/IndicSynth_notebook.ipynb) | Kaggle / Colab / local CPU | revision `c0a10386`, seed 42 |
 | ASVspoof 2019 LA EDA | [`ASVspoof_notebook.ipynb`](../../notebooks/Milestone-2/ASVspoof_notebook.ipynb) | Colab / local CPU | revision `401e90d3`, seed 42 |
 | In-the-Wild EDA | [`InTheWild_notebook.ipynb`](../../notebooks/Milestone-2/InTheWild_notebook.ipynb) | Colab / Kaggle CPU | revision `eee168f9`, seed 42 |
