@@ -125,7 +125,7 @@ GENERATOR_NAMES = {"xtts_v2": "XTTS-v2", "freevc24": "FreeVC24"}
 
 GROUPS_PER_GENERATOR = 25  # parquet row groups sampled per language and generator
 CLIPS_PER_GROUP = 20       # clips decoded from each sampled row group
-N_THREADS = 16             # parallel downloads
+N_THREADS = 6              # parallel downloads (more is faster but needs more memory)
 
 KATHBATH_TRANSCRIPTS_URL = "https://objectstore.e2enetworks.net/indic-superb/kathbath/clean/transcripts_n2w.tar"
 KATHBATH_FOLDERS = {"Hindi": "hindi", "Tamil": "tamil", "Telugu": "telugu"}
@@ -747,6 +747,25 @@ show_table(pd.crosstab([meta.language, meta.generator], meta.split)[["train", "v
 fv = meta[meta.generator == "freevc24"]
 show_table(fv.groupby("language").kept.agg(lambda k: round(100 * (1 - k.mean()), 1)).rename("freevc24_dropped_pct").to_frame(),
            "Table 5.2 — FreeVC24 clips dropped because source and target speakers fall in different splits", precision=1)
+
+split_counts = pd.crosstab([meta.language, meta.generator], meta.split)[["train", "valid", "test", "dropped"]] / 1000
+split_colors = {"train": "#2a78d6", "valid": "#1baf7a", "test": "#eda100", "dropped": "#c9c7bf"}
+split_names = {"train": "Train", "valid": "Validation", "test": "Test", "dropped": "Dropped (speakers in different splits)"}
+labels = [f"{language} · {GENERATOR_NAMES[generator]}" for language, generator in split_counts.index]
+fig, ax = plt.subplots(figsize=(9, 3.9))
+y = np.arange(len(labels))[::-1]
+left = np.zeros(len(labels))
+for split in split_counts.columns:
+    ax.barh(y, split_counts[split], left=left, height=0.62, color=split_colors[split], label=split_names[split],
+            edgecolor=SURFACE, linewidth=2)
+    left += split_counts[split].to_numpy()
+ax.set_yticks(y, labels, color=INK)
+ax.set_xlabel("IndicSynth clips (thousands)", color=INK)
+style_axes(ax, grid_axis="x")
+ax.legend(frameon=False, loc="lower center", bbox_to_anchor=(0.45, -0.42), ncol=4, labelcolor=INK)
+ax.set_title("Figure 5.1 — Simulated speaker-disjoint 70/15/15 split (seed 42)", color=INK, loc="left")
+fig.tight_layout()
+plt.show()
 """)
 
 code("""
@@ -788,7 +807,7 @@ checklist = pd.DataFrame([
     ("Missing values, inconsistencies, duplicates", "1, 4", "Tables 1.1, 4.1, 4.1b"),
     ("Noise / audio quality", "4", "Tables 4.1–4.3; Figures 4.2–4.4"),
     ("Link to the other datasets (Kathbath)", "3", "Tables 3.1–3.6"),
-    ("Split strategy and leakage", "5", "Tables 5.1–5.3"),
+    ("Split strategy and leakage", "5", "Tables 5.1–5.3, Figure 5.1"),
     ("Reproducibility", "0", f"pinned revision {HF_REVISION[:8]}, seed {SEED}, runtime {runtime_min:.1f} min"),
 ], columns=["requirement", "section", "evidence"])
 show_table(checklist, "Table 6.1 — Milestone-2 requirements covered by this notebook", precision=0)
