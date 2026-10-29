@@ -395,7 +395,7 @@ ref_speaker_id, gender, duration_s, orig_sr, sha1, split
 
 ### 9.1 Preprocessing Pipeline
 
-One function, [`preprocess.py`](../../notebooks/Milestone-2/preprocess.py), is applied to every clip from every source, real or fake. It removes the shortcuts found in Section 4.2.
+One function, [`preprocess.py`](../../scratchpad/himanshu/milestone-2/preprocess.py), is applied to every clip from every source, real or fake. It removes the shortcuts found in Section 4.2.
 
 ```python
 TARGET_SR = 16000          # XLS-R was pretrained on 16 kHz audio
@@ -487,7 +487,7 @@ The classifier uses only audio and a label, so transcripts are not needed for tr
 | Sentence selection | [`select_sentences.py`](../../scratchpad/Tarika/milestone-2/select_sentences.py) | any | seed 42; output MD5 `ad1f2223…` |
 | Generation | [`generate_fakes_kaggle.ipynb`](../../notebooks/Milestone-2/generate_fakes_kaggle.ipynb) | Kaggle, 2 × T4 | seed 42 + clip index; one generator per run |
 | Generated-set checks | [`summarize_dataset.py`](../../scratchpad/Tarika/milestone-2/summarize_dataset.py) | any | reads the manifests |
-| Preprocessing | [`preprocess.py`](../../notebooks/Milestone-2/preprocess.py) | any | fixed parameters; deterministic output hash |
+| Preprocessing | [`preprocess.py`](../../scratchpad/himanshu/milestone-2/preprocess.py) | any | fixed parameters; deterministic output hash |
 
 > **Reproducibility statement.** All randomness uses seed 42 (sampling, sentence selection, generation and split assignment), and every Hugging Face source is pinned to a fixed revision. Generation was verified to be deterministic: clips regenerated in separate runs were byte-identical to the stored clips. The analysis notebooks need only a CPU; generation needs a Kaggle GPU session.
 
