@@ -6,7 +6,7 @@
 
 ## 1. Objective
 
-This report documents the data source, dataset structure, protocol and metadata checks, audio-quality checks, suitability for the project, and the augmentation recommendation for the ASVspoof 2019 LA dataset. Unlike Kathbath, which provides real speech only, ASVspoof directly supplies the bonafide-versus-spoof labels required to train and evaluate a deepfake countermeasure: every spoofed utterance is a synthesized (TTS) or converted (voice conversion) rendering of the same English speaker population as the bonafide utterances.
+This report documents the data source, dataset structure, protocol and metadata checks, audio-quality checks, suitability for the project, and the augmentation recommendation for the ASVspoof 2019 LA dataset. ASVspoof directly supplies the bonafide-versus-spoof labels required to train and evaluate a deepfake countermeasure: every spoofed utterance is a synthesized (TTS) or converted (voice conversion) rendering of the same English speaker population as the bonafide utterances.
 
 ## 2. Dataset Access and Licensing
 
@@ -96,8 +96,6 @@ The official five-column protocol — `speaker_id utterance_id unused('-') attac
 | Unique utterance IDs                 | 71,237          | PASS   |
 | Eval-only utterance prefixes         | LA_E_*          | PASS   |
 | Attack IDs (protocol)                | A07–A19         | PASS   |
-
-The HF package and the official protocol agree completely, with no missing or conflicting metadata. The package does not ship transcripts or speaker attributes (the LA utterances are English text prompts), so the transcript and gender checks performed for Kathbath do not apply here.
 
 ## 5. Duration Analysis
 
@@ -217,11 +215,6 @@ The HF package ships **only the official LA eval partition**; there is no train/
 ## 12. Reproducibility
 
 The notebook uses Hugging Face datasets (streaming mode — only analysed rows are downloaded from the ~4.4 GB parquet store), SoundFile for decoding, librosa for the log-mel spectrograms, pandas, NumPy, Matplotlib and Seaborn. The seed is fixed at 42 and the HF dataset revision is pinned (`401e90d3efddb3a2b2ee5f3ee53b737b603d7eae`), so results are consistent across runs. Total notebook runtime is about one minute.
-
-**Generated outputs:**
-
-- `asvspoof_fig_2_1_class_imbalance.png`, `asvspoof_fig_2_2_attack_distribution.png`, `asvspoof_fig_3_1_duration_distribution.png`, `asvspoof_fig_3_2_signal_stats.png`, `asvspoof_fig_4_1_spectral_examples.png` — the five figures embedded above.
-- `working/asvspoof2019_la_eval_manifest.csv` (2.7 MB) — the full 71,237-row manifest (utterance ID, speaker ID, attack type, attack group, label, target), the bridge to the PyTorch training milestone.
 
 ## 13. References
 

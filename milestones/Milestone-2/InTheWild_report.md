@@ -367,11 +367,6 @@ The proposal assigns each speaker to exactly one split and hits the 80/10/10 tar
 
 The notebook downloads the pinned single-file release with `hf_hub_download` (revision `eee168f92c367f8c82ff2cf42b6f61e362fd6211`, 8.16 GB, ~1.1 min), reads the ZIP **central directory** without extraction, and decodes only the seeded 2,000-clip sample with `soundfile`; `librosa` is used solely for the log-mel examples and no deep-learning framework is imported (CPU-only). `datasets` is deliberately not used — the repository has no loading script and a ZIP cannot be streamed. All randomness uses **seed 42** (sample draw, split assignment), so every table here is reproducible run-to-run.
 
-**Generated outputs:**
-
-- `inthewild_fig_2_1_class_imbalance.png`, `…_2_2_size_and_speakers.png`, `…_3_1_duration_distribution.png`, `…_3_2_signal_stats.png`, `…_3_3_format_consistency.png`, `…_3_4_size_duration_proxy.png`, `…_4_1_spectral_examples.png`, `…_5_1_augmentation_priority_risk.png`, `…_6_1_speaker_label_mix.png`, `…_6_2_split_balance.png` — the ten figures embedded above.
-- `working/inthewild_manifest.csv` (3.57 MB) — the full 31,779-row manifest (file name, member path, speaker, label, target, file/compressed sizes, CRC32, proxy duration), the bridge to the PyTorch training milestone.
-
 ## 13. References
 
 1. Müller, N.-C., Czempin, P., Dieckmann, F., Froghyar, A., & Böttinger, K. (2022). _Does Audio Deepfake Detection Generalize?_ Interspeech 2022: https://arxiv.org/abs/2203.16263
