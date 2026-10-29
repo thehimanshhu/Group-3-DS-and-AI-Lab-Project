@@ -125,12 +125,12 @@ The metadata of every clip was read, and 3,000 clips (500 per generator and lang
 The class imbalance means a classifier that always answers "spoof" already reaches 89.7% accuracy, so accuracy is not a useful metric here. EER and per-class recall are reported instead. In the sampled audio, real clips contain about three times more silence than spoofed clips (median 17% of frames vs 5.5%).
 
 <div align="center">
-  <img src="figures/asvspoof/asvspoof_fig_2_2_attack_distribution.png" alt="Figure 3: ASVspoof 2019 LA eval utterances per class and attack system. Each of the 13 attacks contributes 4,914 utterances." width="800">
+  <img src="../../assets/infographics/Milestone-2/asvspoof/asvspoof_fig_2_2_attack_distribution.png" alt="Figure 3: ASVspoof 2019 LA eval utterances per class and attack system. Each of the 13 attacks contributes 4,914 utterances." width="800">
   <br>
   <em>Figure 3: ASVspoof 2019 LA eval utterances per class and attack system. Each of the 13 attacks contributes 4,914 utterances.</em>
 </div>
 
-Full details: [`ASVspoof_report.md`](ASVspoof_report.md).
+Full details: [`ASVspoof_report.md`](../../scratchpad/vikram/ASVspoof_report.md).
 
 ### 3.4 In-the-Wild (real-world English test set)
 
@@ -145,12 +145,12 @@ Full details: [`ASVspoof_report.md`](ASVspoof_report.md).
 Fake clips are longer (median 4.29 s vs 3.10 s) and contain more silence than real clips (median 12.8% of frames vs 0%), the opposite direction from ASVspoof.
 
 <div align="center">
-  <img src="figures/inthewild/inthewild_fig_6_1_speaker_label_mix.png" alt="Figure 4: In-the-Wild clips per speaker and label. Every one of the 54 speakers has both real and fake clips." width="800">
+  <img src="../../assets/infographics/Milestone-2/inthewild/inthewild_fig_6_1_speaker_label_mix.png" alt="Figure 4: In-the-Wild clips per speaker and label. Every one of the 54 speakers has both real and fake clips." width="800">
   <br>
   <em>Figure 4: In-the-Wild clips per speaker and label. Every one of the 54 speakers has both real and fake clips.</em>
 </div>
 
-Full details: [`InTheWild_report.md`](InTheWild_report.md).
+Full details: [`InTheWild_report.md`](../../scratchpad/vikram/InTheWild_report.md).
 
 ### 3.5 Our Generated Set (unseen-generator test)
 
@@ -349,7 +349,7 @@ Kathbath's own valid split is not used as our validation set, because all its sp
 - **Cross-generator:** train on XTTS-v2 and test on FreeVC24.
 - **Channel:** the phone-channel version of each test set.
 
-In-the-Wild stays test-only. Its speaker-disjoint 80/10/10 split ([`InTheWild_report.md`](InTheWild_report.md), Section 9) is kept in reserve in case part of it is later used for fine-tuning.
+In-the-Wild stays test-only. Its speaker-disjoint 80/10/10 split ([`InTheWild_report.md`](../../scratchpad/vikram/InTheWild_report.md), Section 9) is kept in reserve in case part of it is later used for fine-tuning.
 
 ### 7.2 Leakage Checks
 
