@@ -109,7 +109,7 @@ Kathbath also has two test splits, which are not in the Hugging Face release we 
   <em>Figure 3: Kathbath clip durations by language. Telugu clips are the longest and Hindi clips the shortest.</em>
 </div>
 
-Full details: [`kathbath/kathbath_report.md`](kathbath/kathbath_report.md).
+Full details: [`kathbath_report.md`](../../scratchpad/amit/milestone-2/kathbath_report.md).
 
 ### 3.2 IndicSynth (Indian-language fakes for training)
 
@@ -526,7 +526,7 @@ The classifier uses only audio and a label, so transcripts are not needed for tr
 
 | Step | File | Runs on | Fixed inputs |
 | --- | --- | --- | --- |
-| Kathbath EDA | [`kathbath/kathbath_eda.ipynb`](kathbath/kathbath_eda.ipynb) | Hugging Face streaming | seed 42 |
+| Kathbath EDA | [`kathbath_eda.ipynb`](../../scratchpad/amit/milestone-2/kathbath_eda.ipynb) | Hugging Face streaming | seed 42 |
 | IndicSynth EDA | [`IndicSynth_notebook.ipynb`](../../notebooks/Milestone-2/IndicSynth_notebook.ipynb) | Kaggle / Colab / local CPU | revision `c0a10386`, seed 42 |
 | ASVspoof 2019 LA EDA | [`ASVspoof_notebook.ipynb`](../../notebooks/Milestone-2/ASVspoof_notebook.ipynb) | Colab / local CPU | revision `401e90d3`, seed 42 |
 | In-the-Wild EDA | [`InTheWild_notebook.ipynb`](../../notebooks/Milestone-2/InTheWild_notebook.ipynb) | Colab / Kaggle CPU | revision `eee168f9`, seed 42 |
