@@ -61,7 +61,7 @@ The corpus is **real-majority** — the inverse direction of ASVspoof 2019 LA ev
 
 **Fig 2.1 — Class imbalance and the accuracy trap**
 
-![Fig 2.1 — Class imbalance and the accuracy trap](figures/inthewild/inthewild_fig_2_1_class_imbalance.png)
+![Fig 2.1 — Class imbalance and the accuracy trap](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_2_1_class_imbalance.png)
 
 Because 62.8% of clips are real, the majority-class accuracy of 62.8% towers over the 50% balanced baseline, so accuracy alone is a meaningless headline here as well. Balanced accuracy, per-class recall, AUC and EER should be tracked instead.
 
@@ -86,7 +86,7 @@ Because 62.8% of clips are real, the majority-class accuracy of 62.8% towers ove
 
 **Fig 2.2 — File-size distribution and speaker concentration**
 
-![Fig 2.2 — File-size distribution and speaker concentration](figures/inthewild/inthewild_fig_2_2_size_and_speakers.png)
+![Fig 2.2 — File-size distribution and speaker concentration](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_2_2_size_and_speakers.png)
 
 Per-speaker fake shares vary widely (Barack Obama 9.2% vs. The Notorious B.I.G. 95.7%), and **every one of the 54 speakers contributes both real and fake clips**. This is a critical leakage risk for any random clip-level split — it is the core driver of the speaker-disjoint split proposed in §9.
 
@@ -169,7 +169,7 @@ Decoding all 31,779 clips was unnecessary; audio statistics use a **label-strati
 
 **Fig 3.1 — Duration distribution by label (sample n=2,000)**
 
-![Fig 3.1 — Duration distribution by label](figures/inthewild/inthewild_fig_3_1_duration_distribution.png)
+![Fig 3.1 — Duration distribution by label](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_3_1_duration_distribution.png)
 
 Durations are strongly right-skewed and fake clips skew longer than real clips (median 4.29 s vs. 3.10 s, p95 13.36 s vs. 9.18 s, max 24.00 s), because deepfake videos were harvested as segments of online content rather than cut to fixed lengths. Clips are still short, so training must use fixed-length cropping/padding with a documented normalisation policy.
 
@@ -187,7 +187,7 @@ Because sample statistics cannot give corpus totals directly, the notebook fits 
 
 **Fig 3.4 — File-size ↔ duration proxy (sample fit)**
 
-![Fig 3.4 — File-size ↔ duration proxy](figures/inthewild/inthewild_fig_3_4_size_duration_proxy.png)
+![Fig 3.4 — File-size ↔ duration proxy](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_3_4_size_duration_proxy.png)
 
 The linear fit `bytes = 64,000 × seconds + 58` achieves R² = 1.000000 (MAE 0.000 s) on the sample — expected, since 16 kHz mono float32 is exactly 64,000 B/s — and yields proxy durations of mean 4.288 s, median 3.272 s, p95 10.795 s, max 24.991 s over the full manifest. The resulting **37.85 h** total lands within 0.05 h of the published 37.9 h, independently validating both the file accounting and the packaged metadata.
 
@@ -195,7 +195,7 @@ The linear fit `bytes = 64,000 × seconds + 58` achieves R² = 1.000000 (MAE 0.0
 
 **Fig 3.2 — Signal statistics by label (seeded sample)**
 
-![Fig 3.2 — Signal statistics by label](figures/inthewild/inthewild_fig_3_2_signal_stats.png)
+![Fig 3.2 — Signal statistics by label](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_3_2_signal_stats.png)
 
 Fake clips are quieter and more compressed-looking than real clips (RMS median −28.67 vs. −26.41 dBFS), slightly higher in zero-crossing rate, and — the most marked class skew — carry substantial pause time (median 12.8% silent frames vs. **0.0%** for real clips, the inverse of the ASVspoof 2019 LA direction where bonafide had more silence). Preprocessing must therefore handle leading/trailing silence and loudness identically for both labels so the model does not learn a trivial loudness or pause shortcut.
 
@@ -217,7 +217,7 @@ Fake clips are quieter and more compressed-looking than real clips (RMS median �
 
 **Fig 3.3 — Format consistency in the seeded sample**
 
-![Fig 3.3 — Format consistency in the seeded sample](figures/inthewild/inthewild_fig_3_3_format_consistency.png)
+![Fig 3.3 — Format consistency in the seeded sample](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_3_3_format_consistency.png)
 
 The sampled audio is uniformly **16 kHz mono WAV / IEEE float32** with zero decode errors and no clipping — not mp3 with variable rates as anticipated. There is no decode risk, but 20 sample clips are over 50% silent frames and deserve inspection. Format conclusions cover 2,000 of 31,779 clips; level statistics remain estimates.
 
@@ -249,7 +249,7 @@ One seeded real and one seeded fake clip from the sample were rendered as wavefo
 
 **Fig 4.1 — Waveform and log-mel examples (seeded sample)**
 
-![Fig 4.1 — Waveform and log-mel examples](figures/inthewild/inthewild_fig_4_1_spectral_examples.png)
+![Fig 4.1 — Waveform and log-mel examples](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_4_1_spectral_examples.png)
 
 Real and fake speech occupy the same 16 kHz band and have broadly similar time-frequency structure — no single visual cue separates the classes. The examples are useful for verifying preprocessing (mono conversion, fixed-length crops, mel geometry), not for visual classification. And because all fakes come from **one** TTS, a model can learn generator-specific artefacts rather than general deepfake cues — which is why the split and leakage checks in §9 matter more than any single spectrogram.
 
@@ -273,7 +273,7 @@ Augmentation is a training-pipeline concern, not an EDA deliverable, so no trans
 
 **Fig 5.1 — Augmentation priority vs. risk**
 
-![Fig 5.1 — Augmentation priority vs. risk](figures/inthewild/inthewild_fig_5_1_augmentation_priority_risk.png)
+![Fig 5.1 — Augmentation priority vs. risk](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_5_1_augmentation_priority_risk.png)
 
 Start with AWGN, SpecAugment and **codec round-trips** (mp3 first): they target the wild-channel and lossy-source conditions that dominate this corpus and are cheap on CPU. Time/speed/pitch perturbation follows once the baseline is stable; keep reverb low — the data is already wild, and heavy reverb can erase the very TTS artefacts a detector needs to find.
 
@@ -298,7 +298,7 @@ Start with AWGN, SpecAugment and **codec round-trips** (mp3 first): they target 
 
 **Fig 6.1 — Every speaker contributes both real and fake clips**
 
-![Fig 6.1 — Every speaker contributes both real and fake clips](figures/inthewild/inthewild_fig_6_1_speaker_label_mix.png)
+![Fig 6.1 — Every speaker contributes both real and fake clips](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_6_1_speaker_label_mix.png)
 
 **Table 6.2 — Leakage and duplicate checks**
 
@@ -327,7 +327,7 @@ File-level cleanliness is good: no duplicate files, no zero-byte members, numeri
 
 **Fig 6.2 — Proposed speaker-disjoint split balance**
 
-![Fig 6.2 — Proposed speaker-disjoint split balance](figures/inthewild/inthewild_fig_6_2_split_balance.png)
+![Fig 6.2 — Proposed speaker-disjoint split balance](../../assets/infographics/Milestone-2/inthewild/inthewild_fig_6_2_split_balance.png)
 
 The proposal assigns each speaker to exactly one split and hits the 80/10/10 target closely (max clip deviation 0.056 pp) while preserving the global fake share in every split (37.2% / 37.0% / 37.4%). The three largest speakers — Barack Obama (11.4%), Alec Guinness (11.4%) and Donald Trump (10.8%) — each exceed 10% of the corpus and therefore must sit in train, which forces val/test to draw from the smaller half of the speaker pool. All three largest speakers are indeed placed in train in the seed-42 assignment.
 

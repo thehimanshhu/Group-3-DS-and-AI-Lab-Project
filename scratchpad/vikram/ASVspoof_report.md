@@ -34,7 +34,7 @@ The notebook analyses the full **71,237-utterance** LA evaluation partition. All
 
 **Fig 2.1 — Class imbalance and the accuracy trap**
 
-![Fig 2.1 — Class imbalance and the accuracy trap](figures/asvspoof/asvspoof_fig_2_1_class_imbalance.png)
+![Fig 2.1 — Class imbalance and the accuracy trap](../../assets/infographics/Milestone-2/asvspoof/asvspoof_fig_2_1_class_imbalance.png)
 
 The eval set is strongly imbalanced: 89.7% spoof versus 10.3% bonafide. As panel (b) shows, a majority-class classifier that always predicts "spoof" already scores 89.7% accuracy against a 50% balanced baseline. Accuracy is therefore not a meaningful headline metric for this dataset; EER, min-tDCF and per-class recall should be reported instead.
 
@@ -62,7 +62,7 @@ Attack A16 reuses the A04 TTS algorithm and A19 reuses the A06 VC algorithm, so 
 
 **Fig 2.2 — Utterances per class and attack ID (eval)**
 
-![Fig 2.2 — Utterances per class and attack ID](figures/asvspoof/asvspoof_fig_2_2_attack_distribution.png)
+![Fig 2.2 — Utterances per class and attack ID](../../assets/infographics/Milestone-2/asvspoof/asvspoof_fig_2_2_attack_distribution.png)
 
 | Attack group | Attack IDs   | Attacks | Utterances | % of Spoof |
 | ------------ | ------------ | ------: | ---------: | ---------: |
@@ -119,7 +119,7 @@ Scaling the sample mean duration by 71,237 utterances estimates the full eval au
 
 **Fig 3.1 — Duration distribution by label (sample n=2,000)**
 
-![Fig 3.1 — Duration distribution by label](figures/asvspoof/asvspoof_fig_3_1_duration_distribution.png)
+![Fig 3.1 — Duration distribution by label](../../assets/infographics/Milestone-2/asvspoof/asvspoof_fig_3_1_duration_distribution.png)
 
 Bonafide clips skew considerably longer than spoof clips (median 3.24 s vs 2.75 s), a distributional side effect of the attack pipeline rather than a quality issue. Utterances are short overall, so training will need fixed-length cropping or padding together with a consistent normalisation policy.
 
@@ -127,7 +127,7 @@ Bonafide clips skew considerably longer than spoof clips (median 3.24 s vs 2.75 
 
 **Fig 3.2 — Signal statistics by label (seeded sample)**
 
-![Fig 3.2 — Signal statistics by label](figures/asvspoof/asvspoof_fig_3_2_signal_stats.png)
+![Fig 3.2 — Signal statistics by label](../../assets/infographics/Milestone-2/asvspoof/asvspoof_fig_3_2_signal_stats.png)
 
 The spoofed clips are slightly louder (RMS median −17.4 vs −19.4 dBFS) and have more high-frequency energy (higher zero-crossing rate), while the most striking class skew is silence: bonafide clips carry about three times more pause time (median 17.0% of frames vs 5.5%), and 16 of the 2,000 sampled files exceed 50% silent frames. Leading/trailing silence therefore has to be trimmed or handled identically in preprocessing so the model does not learn a trivial silence shortcut.
 
@@ -152,7 +152,7 @@ One seeded bonafide and one seeded spoof utterance from the sample were rendered
 
 **Fig 4.1 — Waveform and log-mel examples (eval, seeded)**
 
-![Fig 4.1 — Waveform and log-mel examples](figures/asvspoof/asvspoof_fig_4_1_spectral_examples.png)
+![Fig 4.1 — Waveform and log-mel examples](../../assets/infographics/Milestone-2/asvspoof/asvspoof_fig_4_1_spectral_examples.png)
 
 The bonafide example (`LA_E_8859944`) and the spoof example (`LA_E_2477389`, attack A17) share the same 16 kHz band and a broadly similar time-frequency structure. This is the qualitative core finding of the EDA: spoofed speech can look perfectly plausible in both the time and spectral domains, so the discriminative cues are subtle artefacts that a model must learn rather than something visible to the eye. Evaluation should consequently track per-attack behaviour instead of only an aggregate score.
 
