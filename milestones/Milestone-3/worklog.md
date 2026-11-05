@@ -34,4 +34,8 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 ### Contributions in Milestone 3
 
--
+- Preprocessed ASVspoof and In-The-Wild datasets.
+- Saved Hugging Face-compliant datasets for the same.
+- Created preprocessing and data augmentation notebooks.
+- Implemented data various data augmentation techniques.
+- Created a model evaluation pipeline by using a fixed XLS + various classifiers.
