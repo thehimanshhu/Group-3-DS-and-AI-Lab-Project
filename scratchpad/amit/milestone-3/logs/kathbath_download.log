@@ -1,0 +1,29 @@
+2026-11-04 10:42:37,092 | INFO | HTTP Request: GET https://huggingface.co/api/datasets/ai4bharat/Kathbath/revision/main "HTTP/1.1 200 OK"
+2026-11-04 10:42:37,096 | INFO | Dataset: ai4bharat/Kathbath
+2026-11-04 10:42:37,097 | INFO | Verified commit SHA: 5b9e92849222026d9141acba4e8434fe816396bf
+2026-11-04 10:42:37,099 | INFO | Downloading hindi | train
+2026-11-04 10:42:37,395 | INFO | HTTP Request: HEAD https://huggingface.co/datasets/ai4bharat/Kathbath/resolve/5b9e92849222026d9141acba4e8434fe816396bf/Kathbath.py "HTTP/1.1 404 Not Found"
+2026-11-04 10:42:38,479 | INFO | HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/ai4bharat/Kathbath/ai4bharat/Kathbath.py "HTTP/1.1 404 Not Found"
+2026-11-04 10:42:39,506 | INFO | HTTP Request: GET https://huggingface.co/api/datasets/ai4bharat/Kathbath/revision/5b9e92849222026d9141acba4e8434fe816396bf "HTTP/1.1 200 OK"
+2026-11-04 10:42:39,804 | INFO | HTTP Request: HEAD https://huggingface.co/datasets/ai4bharat/Kathbath/resolve/5b9e92849222026d9141acba4e8434fe816396bf/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-11-04 10:42:40,143 | INFO | HTTP Request: GET https://huggingface.co/api/datasets/ai4bharat/Kathbath/tree/5b9e92849222026d9141acba4e8434fe816396bf/bengali?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-11-04 10:42:40,444 | INFO | HTTP Request: GET https://huggingface.co/api/datasets/ai4bharat/Kathbath/tree/5b9e92849222026d9141acba4e8434fe816396bf?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-11-04 10:42:40,878 | INFO | HTTP Request: HEAD https://huggingface.co/datasets/ai4bharat/Kathbath/resolve/5b9e92849222026d9141acba4e8434fe816396bf/dataset_infos.json "HTTP/1.1 404 Not Found"
+2026-11-04 10:42:41,191 | INFO | HTTP Request: GET https://huggingface.co/api/datasets/ai4bharat/Kathbath/tree/5b9e92849222026d9141acba4e8434fe816396bf/hindi?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-11-04 10:44:40,357 | INFO | Saved hindi | train | 91752 records
+2026-11-04 10:44:43,159 | INFO | Downloading tamil | train
+2026-11-04 10:44:43,996 | INFO | HTTP Request: HEAD https://huggingface.co/datasets/ai4bharat/Kathbath/resolve/5b9e92849222026d9141acba4e8434fe816396bf/Kathbath.py "HTTP/1.1 404 Not Found"
+2026-11-04 10:44:45,109 | INFO | HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/ai4bharat/Kathbath/ai4bharat/Kathbath.py "HTTP/1.1 404 Not Found"
+2026-11-04 10:44:45,549 | INFO | HTTP Request: HEAD https://huggingface.co/datasets/ai4bharat/Kathbath/resolve/5b9e92849222026d9141acba4e8434fe816396bf/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-11-04 10:44:46,115 | INFO | HTTP Request: HEAD https://huggingface.co/datasets/ai4bharat/Kathbath/resolve/5b9e92849222026d9141acba4e8434fe816396bf/dataset_infos.json "HTTP/1.1 404 Not Found"
+2026-11-04 10:44:46,434 | INFO | HTTP Request: GET https://huggingface.co/api/datasets/ai4bharat/Kathbath/tree/5b9e92849222026d9141acba4e8434fe816396bf/tamil?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-11-04 10:47:14,512 | INFO | Saved tamil | train | 95762 records
+2026-11-04 10:47:17,243 | INFO | Downloading telugu | train
+2026-11-04 10:47:17,875 | INFO | HTTP Request: HEAD https://huggingface.co/datasets/ai4bharat/Kathbath/resolve/5b9e92849222026d9141acba4e8434fe816396bf/Kathbath.py "HTTP/1.1 404 Not Found"
+2026-11-04 10:47:18,989 | INFO | HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/ai4bharat/Kathbath/ai4bharat/Kathbath.py "HTTP/1.1 404 Not Found"
+2026-11-04 10:47:19,383 | INFO | HTTP Request: HEAD https://huggingface.co/datasets/ai4bharat/Kathbath/resolve/5b9e92849222026d9141acba4e8434fe816396bf/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-11-04 10:47:19,847 | INFO | HTTP Request: HEAD https://huggingface.co/datasets/ai4bharat/Kathbath/resolve/5b9e92849222026d9141acba4e8434fe816396bf/dataset_infos.json "HTTP/1.1 404 Not Found"
+2026-11-04 10:47:20,149 | INFO | HTTP Request: GET https://huggingface.co/api/datasets/ai4bharat/Kathbath/tree/5b9e92849222026d9141acba4e8434fe816396bf/telugu?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-11-04 10:49:49,068 | INFO | Saved telugu | train | 70673 records
+2026-11-04 10:49:52,448 | INFO | Kathbath download completed.
+2026-11-04 10:49:52,450 | INFO | Metadata saved to C:\Users\palam\OneDrive\Desktop\ds-ai-lab\Group-3-DS-and-AI-Lab-Project\scratchpad\amit\milestone-3\data\raw\kathbath\download_metadata.json
