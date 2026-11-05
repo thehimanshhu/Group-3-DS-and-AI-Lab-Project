@@ -1,0 +1,6 @@
+split,clips,EER (%),ROC AUC,accuracy,real → real,real → fake,fake → real,fake → fake
+valid,397,24.4,0.863,0.756,149,48,49,151
+test_indomain,300,17.7,0.924,0.78,142,8,58,92
+test_unseen_gen,540,20.6,0.854,0.743,251,19,120,150
+test_itw,193,31.6,0.735,0.658,89,8,58,38
+test_asvspoof,96,33.3,0.763,0.5,0,48,0,48
