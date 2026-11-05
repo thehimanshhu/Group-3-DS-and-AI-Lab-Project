@@ -1,0 +1,10 @@
+CLAUDE.md
+
+# Milestone 3: data, runs and checkpoints stay out of git
+data/*
+!data/README.md
+runs/
+checkpoints/
+*.pt
+*.ckpt
+__pycache__/
