@@ -1,0 +1,13 @@
+{
+    "dataset": "ai4bharat/Kathbath",
+    "revision": "5b9e92849222026d9141acba4e8434fe816396bf",
+    "languages": [
+        "hindi",
+        "tamil",
+        "telugu"
+    ],
+    "splits": [
+        "train"
+    ],
+    "downloaded_at_utc": "2026-11-04T05:19:52.439017+00:00"
+}

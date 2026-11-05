@@ -28,12 +28,19 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 │   ├── Milestone-1/
 │   │   ├── Milestone-1.md   # Problem definition & literature review
 │   │   └── worklog.md       # Contributions of each member
-│   └── Milestone-2/
-│       ├── Milestone-2.md   # Dataset identification & preparation
+│   ├── Milestone-2/
+│   │   ├── Milestone-2.md   # Dataset identification & preparation
+│   │   ├── worklog.md
+│   │   └── ...              # Presentation
+│   └── Milestone-3/
+│       ├── Milestone-3.md   # Model architecture & end-to-end pipeline check
 │       ├── worklog.md
-│       └── ...              # Per-dataset EDA reports and figures
+│       └── Milestone-3-presentation.pdf
 ├── notebooks/
-│   └── Milestone-2/         # EDA notebooks, generation pipeline, preprocessing
+│   ├── Milestone-2/         # EDA notebooks, generation pipeline
+│   └── Milestone-3/         # Data preparation and pipeline-check notebooks, run outputs
+├── data/README.md           # Layout of the (uncommitted) data folder and how to get it
+├── requirements.txt         # Python dependencies
 └── scratchpad/              # Personal working notes of each member
 ```
 
@@ -41,12 +48,25 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 
 | # | Milestone | Due | Status |
 | --- | --- | --- | --- |
-| 1 | Problem definition & literature review | 22 Oct | Done |
-| 2 | Dataset preparation | 29 Oct | Done |
-| 3 | Model architecture | 5 Nov | Planned |
+| 1 | [Problem definition & literature review](milestones/Milestone-1/Milestone-1.md) | 22 Oct | Done |
+| 2 | [Dataset preparation](milestones/Milestone-2/Milestone-2.md) | 29 Oct | Done |
+| 3 | [Model architecture](milestones/Milestone-3/Milestone-3.md) | 5 Nov | Done |
 | 4 | Model training | 19 Nov | Planned |
 | 5 | Evaluation & analysis | 26 Nov | Planned |
 | 6 | Deployment & documentation | 10 Dec | Planned |
+
+## Milestone 3: Model Architecture and Pipeline Check
+
+- **Report:** [Milestone-3.md](milestones/Milestone-3/Milestone-3.md) · [Presentation](milestones/Milestone-3/Milestone-3-presentation.pdf) · [Worklog](milestones/Milestone-3/worklog.md)
+- **Notebooks** (saved with their outputs):
+  - [`01_data_preparation.ipynb`](notebooks/Milestone-3/01_data_preparation.ipynb): builds the seeded 3,018-clip subset, preprocessing, manifest and leakage checks
+  - [`02_pipeline_check.ipynb`](notebooks/Milestone-3/02_pipeline_check.ipynb): XLS-R 300M + classification head, one training epoch, inference and evaluation; outputs in [`run_outputs/`](notebooks/Milestone-3/run_outputs/)
+
+**To reproduce the run:**
+
+1. `pip install -r requirements.txt`
+2. Optional: rebuild the subset by running `01_data_preparation.ipynb` (needs access to the gated `ai4bharat/Kathbath` on Hugging Face; about 40 minutes).
+3. Run `02_pipeline_check.ipynb` on Kaggle with a T4 GPU and internet on, with the subset dataset attached as input. The audio isn't stored in this repository; see [`data/README.md`](data/README.md) for access.
 
 ## Team
 
