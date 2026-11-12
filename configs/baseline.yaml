@@ -1,0 +1,37 @@
+# Baseline config for Milestone 4. Every grid run copies this file
+# and changes only the setting being tested (see temp plan, Section 6).
+run_id: baseline
+seed: 42
+
+data:
+  manifest: manifests/manifest_m4.csv   # found under /kaggle/input on Kaggle
+  sample_rate: 16000
+  crop_seconds: 4.0                     # random crop in training, middle crop otherwise
+
+model:
+  name: facebook/wav2vec2-xls-r-300m
+  freeze_feature_encoder: true          # CNN stays frozen
+  freeze_transformer_layers: 0          # bottom N transformer layers frozen
+  pooling: mean                         # mean over frames with audio (uses the attention mask)
+  dropout: 0.1
+
+train:
+  epochs: 5
+  batch_size: 8
+  grad_accum_steps: 1
+  lr_encoder: 1.0e-5
+  lr_head: 1.0e-3
+  weight_decay: 0.01
+  scheduler: cosine
+  warmup_ratio: 0.1
+  grad_clip_norm: 1.0
+  fp16: true
+  class_weights: from_train             # computed from the train split only
+  early_stopping_patience: 2            # on valid EER
+
+augment:
+  noise: false
+  gain: false
+  rawboost: false
+  codec: false
+  time_offset: false

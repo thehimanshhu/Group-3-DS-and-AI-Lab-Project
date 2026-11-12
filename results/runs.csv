@@ -1,0 +1,1 @@
+run_id,owner,kaggle_account,setting_changed,epochs,best_valid_eer,train_minutes,git_commit,checkpoint
