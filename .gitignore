@@ -8,3 +8,6 @@ checkpoints/
 *.pt
 *.ckpt
 __pycache__/
+
+# Milestone 4: generated from results/*/run.json by src.collect_runs
+results/runs.csv
