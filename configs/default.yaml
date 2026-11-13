@@ -1,7 +1,11 @@
-# Baseline config for Milestone 4. Every grid run copies this file
+# Default XLS-R config for Milestone 4. Every grid run copies this file
 # and changes only the setting being tested (see temp plan, Section 6).
-run_id: baseline
+run_id: default
 seed: 42
+
+experiment:            # copied into run.json; fill in for every run
+  owner: Tarika
+  param: null          # the one dotted setting this run changes, e.g. train.lr_encoder (null for the default)
 
 data:
   manifest: manifests/manifest_m4.csv   # found under /kaggle/input on Kaggle
