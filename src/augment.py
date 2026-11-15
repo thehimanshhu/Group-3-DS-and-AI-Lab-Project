@@ -1,8 +1,11 @@
 """Label-independent waveform augmentation for preprocessed mono 16 kHz audio.
 
-Import individual effects, or use ``apply(wave, sr, augment_cfg, rng)``. Every
-effect is disabled by default; enabled effects have independent probability 0.5.
-Configuration is a plain, YAML-compatible dictionary or AugmentationConfig:
+Import individual effects, or use ``apply(wave, sr, augment_cfg, rng)``. The
+notebook-facing effects are called as ``effect(wave, sr, rng)`` (or
+``effect(wave, rng)`` for RawBoost and the noise/gain helpers); optional keyword
+arguments fix their sampled ranges. Every effect is disabled by default; enabled
+effects have independent probability 0.5. Configuration is a plain,
+YAML-compatible dictionary or AugmentationConfig:
 
     cfg = {
         "noise": {"enabled": True, "kind": "gaussian", "snr_db": [15, 20]},
@@ -19,8 +22,9 @@ MUSAN uses local WAV/FLAC files only; G.711 codecs use an optional FFmpeg binary
 Speed changes duration; other effects preserve length. Individual effects do
 not apply a final loudness normalization. ``apply`` protects peaks after an
 effect runs, but returns an unchanged copy when every effect is disabled/skipped.
-Speed/pitch can obscure spoof cues: these strengths are starting points, not
-validated training settings.
+``codec`` defaults to the full phone channel and chooses G.711 mu-law/A-law with
+the caller's generator. Speed/pitch can obscure spoof cues: these strengths are
+starting points, not validated training settings.
 """
 
 from __future__ import annotations
@@ -69,7 +73,7 @@ _DEFAULTS: dict[str, dict[str, object]] = {
     "rawboost": _RAWBOOST_DEFAULTS,
     "noise": {"kind": "gaussian", "snr_db": 15.0, "folder": None},
     "gain": {"gain_db": (-6.0, 6.0)},
-    "channel": {"mode": "phone", "codec": "mulaw", "ffmpeg_path": "ffmpeg"},
+    "channel": {"mode": "phone", "codec": "random", "ffmpeg_path": "ffmpeg"},
 }
 
 
@@ -158,9 +162,10 @@ def _options(name, supplied):
     elif name == "channel":
         if options["mode"] not in ("codec", "phone"):
             raise ValueError("channel.mode must be 'codec' or 'phone'.")
-        if options["codec"] not in ("mulaw", "alaw"):
+        if options["codec"] not in ("random", "mulaw", "alaw"):
             raise ValueError(
-                "channel.codec must be 'mulaw' or 'alaw'; AMR is not supported."
+                "channel.codec must be 'random', 'mulaw' or 'alaw'; "
+                "AMR is not supported."
             )
         options["ffmpeg_path"] = _path(options["ffmpeg_path"], "channel.ffmpeg_path")
     elif name == "rawboost":
@@ -223,7 +228,9 @@ class AugmentationConfig:
       filter_gain_db=[0, 0], nonlinear_order=5, nonlinear_bias_db=[5, 20],
       max_impulsive_percent=10, impulsive_gain=2, stationary_snr_db=[10, 40].
       Components run serially in the configured order, behind one probability.
-    - channel: mode='phone'|'codec', codec='mulaw'|'alaw', ffmpeg_path='ffmpeg'.
+    - channel: mode='phone'|'codec', codec='random'|'mulaw'|'alaw',
+      ffmpeg_path='ffmpeg'. 'random' selects mu-law or A-law with the pipeline
+      generator; mode='phone' is the notebook default full phone chain.
     - peak_ceiling: 0.99, applied only after an effect is selected.
 
     Reconstruct the config after changing settings to validate the new values.
@@ -369,31 +376,48 @@ def random_gain(wave, rng, gain_db=(-6.0, 6.0)):
     return _wave(wave * 10.0 ** (rng.uniform(*bounds) / 20.0))
 
 
-def speed(wave, rate):
-    """Pitch-preserving time stretch; output length is round(len(wave) / rate)."""
+def speed(wave, sr, rng, rate=(0.9, 1.1)):
+    """Pitch-preserving time stretch; output length is round(len(wave) / rate).
+
+    ``rate`` may be a fixed number or an inclusive ``(low, high)`` pair sampled
+    with ``rng``. The notebook form ``speed(wave, sr, rng)`` uses the default
+    range. Librosa receives float64 data to avoid a NumPy/Numba cast warning;
+    ``_wave`` converts the result back to float32.
+    """
     wave = _wave(wave)
-    rate = _number(rate, "rate")
-    if rate <= 0 or round(len(wave) / rate) < 1:
-        raise ValueError("rate must be positive and leave at least one audio sample.")
+    _sample_rate(sr)
+    _generator(rng)
+    rate = rng.uniform(*_range(rate, "rate", positive=True))
+    if round(len(wave) / rate) < 1:
+        raise ValueError("rate must leave at least one audio sample.")
     if rate == 1:
         return wave.copy()
     import librosa
 
-    return _wave(librosa.effects.time_stretch(wave, rate=rate))
+    return _wave(librosa.effects.time_stretch(wave.astype(np.float64), rate=rate))
 
 
-def pitch(wave, sr, semitones):
-    """Shift pitch without changing waveform length."""
+def pitch(wave, sr, rng, semitones=(-2.0, 2.0)):
+    """Shift pitch without changing waveform length.
+
+    ``semitones`` may be fixed or an inclusive ``(low, high)`` pair sampled with
+    ``rng``. The notebook form ``pitch(wave, sr, rng)`` uses the default range.
+    """
     wave = _wave(wave)
     _sample_rate(sr)
-    semitones = _number(semitones, "semitones")
+    _generator(rng)
+    semitones = rng.uniform(*_range(semitones, "semitones"))
     if semitones == 0:
         return wave.copy()
     import librosa
 
     return _wave(
         librosa.effects.pitch_shift(
-            wave, sr=sr, n_steps=semitones, bins_per_octave=12, res_type="soxr_hq"
+            wave.astype(np.float64),
+            sr=sr,
+            n_steps=semitones,
+            bins_per_octave=12,
+            res_type="soxr_hq",
         )
     )
 
@@ -496,18 +520,20 @@ def _unit_peak_if_needed(wave):
     return wave / peak if peak > 1 else wave
 
 
-def rawboost(wave, sr, rng, components=("convolutive", "impulsive"), **parameters):
+def rawboost(wave, rng, components=("convolutive", "impulsive"), **parameters):
     """Apply selected RawBoost components serially, in the supplied order.
 
-    Default: convolutive -> impulsive (reference algorithm 5), not a claim of
-    optimality for XLS-R. Add 'stationary' for filtered independent noise, or
-    select any single component. Other keyword parameters and their defaults
-    are documented on AugmentationConfig. No parallel-combination mode is used.
-    RawBoost retains its component-specific peak scaling, not RMS normalization.
+    The input must already be mono 16 kHz; RawBoost uses ``TARGET_SR``
+    internally. The notebook form is ``rawboost(wave, rng)``. Default:
+    convolutive -> impulsive (reference algorithm 5), not a claim of optimality
+    for XLS-R. Add 'stationary' for filtered independent noise, or select any
+    single component. Other keyword parameters and their defaults are documented
+    on AugmentationConfig. No parallel-combination mode is used. RawBoost
+    retains its component-specific peak scaling, not RMS normalization.
     """
     wave = _wave(wave)
-    _sample_rate(sr)
     _generator(rng)
+    sr = TARGET_SR
     unknown = set(parameters) - set(_RAWBOOST_DEFAULTS)
     if unknown:
         raise ValueError(f"Unknown RawBoost parameters {sorted(unknown, key=str)}.")
@@ -618,10 +644,27 @@ def _codec_roundtrip(wave, sr, name, ffmpeg_path):
     return result
 
 
-def codec(wave, sr, name="mulaw", ffmpeg_path="ffmpeg"):
-    """Actual G.711 mu-law/A-law encode/decode at 16 kHz, via FFmpeg pipes."""
+def codec(wave, sr, rng, mode="phone", name="random", ffmpeg_path="ffmpeg"):
+    """Phone-channel augmentation by default, or a bare G.711 round-trip.
+
+    ``name='random'`` selects mu-law or A-law with ``rng``; pass 'mulaw' or
+    'alaw' to fix the codec. ``mode='phone'`` band-limits to 300-3400 Hz and
+    resamples through 8 kHz; ``mode='codec'`` applies G.711 at the input rate.
+    The notebook form ``codec(wave, sr, rng)`` is the full phone chain.
+    """
     wave = _wave(wave)
     _sample_rate(sr)
+    _generator(rng)
+    if mode not in ("codec", "phone"):
+        raise ValueError("codec mode must be 'codec' or 'phone'.")
+    if name == "random":
+        name = ("mulaw", "alaw")[int(rng.integers(2))]
+    if name not in ("mulaw", "alaw"):
+        raise ValueError(
+            "codec name must be 'random', 'mulaw' or 'alaw'; AMR is not supported."
+        )
+    if mode == "phone":
+        return phone_channel(wave, sr, name, ffmpeg_path)
     return _codec_roundtrip(wave, sr, name, ffmpeg_path)
 
 
@@ -663,9 +706,9 @@ def apply(wave, sr, augment_cfg, rng):
             continue
         try:
             if name == "speed":
-                wave = speed(wave, rng.uniform(*options["rate"]))
+                wave = speed(wave, sr, rng, options["rate"])
             elif name == "pitch":
-                wave = pitch(wave, sr, rng.uniform(*options["semitones"]))
+                wave = pitch(wave, sr, rng, options["semitones"])
             elif name == "shift":
                 wave = time_shift(wave, sr, rng.uniform(*options["seconds"]))
             elif name == "reverb":
@@ -676,7 +719,7 @@ def apply(wave, sr, augment_cfg, rng):
                     for key, value in options.items()
                     if key not in ("enabled", "p")
                 }
-                wave = rawboost(wave, sr, rng, **parameters)
+                wave = rawboost(wave, rng, **parameters)
             elif name == "noise":
                 snr = rng.uniform(*options["snr_db"])
                 wave = (
@@ -687,8 +730,14 @@ def apply(wave, sr, augment_cfg, rng):
             elif name == "gain":
                 wave = random_gain(wave, rng, options["gain_db"])
             else:
-                transform = codec if options["mode"] == "codec" else phone_channel
-                wave = transform(wave, sr, options["codec"], options["ffmpeg_path"])
+                wave = codec(
+                    wave,
+                    sr,
+                    rng,
+                    mode=options["mode"],
+                    name=options["codec"],
+                    ffmpeg_path=options["ffmpeg_path"],
+                )
             applied = True
         except Exception as exc:
             raise ValueError(f"{name} augmentation failed: {exc}") from exc

@@ -1,8 +1,6 @@
 """Synthetic augmentation checks; no corpus, model, or network access.
 
 Run from the repository root:
-    python -m unittest discover -s scratchpad/vikram/milestone-4/tests -v
-Or from scratchpad/vikram/milestone-4:
     python -m unittest discover -s tests -v
 FFmpeg integration tests skip when the executable is unavailable.
 """
@@ -56,7 +54,7 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(asdict(config), asdict(restored))
 
     def test_configuration_does_not_mutate_or_share_dictionaries(self):
-        supplied = {"speed": {"enabled": True, "rate": [0.9, 1.1]}}
+        supplied: dict = {"speed": {"enabled": True, "rate": [0.9, 1.1]}}
         before = json.dumps(supplied)
         config = aug.AugmentationConfig.from_dict(supplied)
         self.assertEqual(json.dumps(supplied), before)
@@ -151,18 +149,19 @@ class WaveformTests(unittest.TestCase):
         np.testing.assert_allclose(result, self.clean * 10 ** (6 / 20), rtol=1e-6)
 
     def test_speed_changes_duration_but_not_pitch(self):
-        result = aug.speed(self.clean, 1.1)
+        result = aug.speed(self.clean, 16000, np.random.default_rng(42), rate=1.1)
         self.assertEqual(len(result), round(len(self.clean) / 1.1))
         self.assertAlmostEqual(peak_frequency(result), 440, delta=3)
-        neutral = aug.speed(self.clean, 1)
+        neutral = aug.speed(self.clean, 16000, np.random.default_rng(42), rate=1)
         np.testing.assert_array_equal(neutral, self.clean)
         self.assertFalse(np.shares_memory(neutral, self.clean))
 
     def test_pitch_preserves_duration(self):
-        result = aug.pitch(self.clean, 16000, 2)
+        result = aug.pitch(self.clean, 16000, np.random.default_rng(42), semitones=2)
         self.assertEqual(len(result), len(self.clean))
         self.assertAlmostEqual(peak_frequency(result), 440 * 2 ** (2 / 12), delta=4)
-        np.testing.assert_array_equal(aug.pitch(self.clean, 16000, 0), self.clean)
+        neutral = aug.pitch(self.clean, 16000, np.random.default_rng(42), semitones=0)
+        np.testing.assert_array_equal(neutral, self.clean)
 
     def test_shift_zero_fills_without_wrapping(self):
         wave = np.arange(1, 6, dtype=np.float32)
@@ -200,11 +199,11 @@ class WaveformTests(unittest.TestCase):
         for transform in (
             lambda: aug.add_noise(self.clean, np.random.default_rng(42)),
             lambda: aug.random_gain(self.clean, np.random.default_rng(42)),
-            lambda: aug.speed(self.clean, 1.1),
-            lambda: aug.pitch(self.clean, 16000, 2),
+            lambda: aug.speed(self.clean, 16000, np.random.default_rng(42)),
+            lambda: aug.pitch(self.clean, 16000, np.random.default_rng(42)),
             lambda: aug.time_shift(self.clean, 16000, 0.1),
             lambda: aug.reverb(self.clean, 16000, np.random.default_rng(42)),
-            lambda: aug.rawboost(self.clean, 16000, np.random.default_rng(42)),
+            lambda: aug.rawboost(self.clean, np.random.default_rng(42)),
         ):
             result = transform()
             np.testing.assert_array_equal(self.clean, original)
@@ -289,9 +288,10 @@ class RawBoostTests(unittest.TestCase):
         self.assertEqual(coefficients.dtype, np.float64)
         self.assertEqual(coefficients.shape, (101,))
         self.assertTrue(np.isfinite(coefficients).all())
-        _, response = freqz(coefficients, worN=[0, 1000, 3000], fs=16000)
-        self.assertLess(abs(response[1]), 0.1 * abs(response[0]))
-        self.assertGreater(abs(response[2]), 0.9 * abs(response[0]))
+        _, response = freqz(coefficients, worN=4096, fs=16000)
+        dc, stopband, passband = response[[0, 512, 1536]]
+        self.assertLess(abs(stopband), 0.1 * abs(dc))
+        self.assertGreater(abs(passband), 0.9 * abs(dc))
 
     def test_nonlinear_gain_bounds_are_ordered_for_generator(self):
         with patch.object(
@@ -299,7 +299,6 @@ class RawBoostTests(unittest.TestCase):
         ) as filters:
             aug.rawboost(
                 sine(0.25),
-                16000,
                 np.random.default_rng(42),
                 ("convolutive",),
                 nonlinear_order=2,
@@ -316,12 +315,8 @@ class RawBoostTests(unittest.TestCase):
             ("convolutive", "impulsive", "stationary"),
         ):
             with self.subTest(components=components):
-                first = aug.rawboost(
-                    clean, 16000, np.random.default_rng(42), components
-                )
-                second = aug.rawboost(
-                    clean, 16000, np.random.default_rng(42), components
-                )
+                first = aug.rawboost(clean, np.random.default_rng(42), components)
+                second = aug.rawboost(clean, np.random.default_rng(42), components)
                 np.testing.assert_array_equal(first, second)
                 self.assertEqual(first.shape, clean.shape)
                 self.assertEqual(first.dtype, np.float32)
@@ -332,7 +327,6 @@ class RawBoostTests(unittest.TestCase):
         clean = sine()
         result = aug.rawboost(
             clean,
-            16000,
             np.random.default_rng(42),
             ("stationary",),
             stationary_snr_db=20,
@@ -346,7 +340,6 @@ class RawBoostTests(unittest.TestCase):
         ):
             result = aug.rawboost(
                 clean,
-                16000,
                 np.random.default_rng(42),
                 ("convolutive", "impulsive", "stationary"),
             )
@@ -357,7 +350,7 @@ class RawBoostTests(unittest.TestCase):
 
     def test_unknown_direct_parameters_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "Unknown RawBoost"):
-            aug.rawboost(sine(), 16000, np.random.default_rng(42), misspelled=1)
+            aug.rawboost(sine(), np.random.default_rng(42), misspelled=1)
 
 
 class PipelineTests(unittest.TestCase):
@@ -370,7 +363,7 @@ class PipelineTests(unittest.TestCase):
             "rawboost": "rawboost",
             "add_noise": "noise",
             "random_gain": "gain",
-            "phone_channel": "channel",
+            "codec": "channel",
         }
         calls = []
         config = {name: {"enabled": True, "p": 1} for name in aug.EFFECT_ORDER}
@@ -505,20 +498,26 @@ assert os.listdir('.') == before
 class CodecTests(unittest.TestCase):
     def test_missing_ffmpeg_and_failed_codec_have_clear_errors(self):
         with self.assertRaisesRegex(RuntimeError, "FFmpeg unavailable"):
-            aug.codec(sine(), 16000, ffmpeg_path="/missing/ffmpeg")
+            aug.codec(
+                sine(),
+                16000,
+                np.random.default_rng(42),
+                mode="codec",
+                ffmpeg_path="/missing/ffmpeg",
+            )
         failed = subprocess.CompletedProcess(
             [], 1, stdout=b"", stderr=b"Unknown encoder"
         )
         with patch.object(aug.subprocess, "run", return_value=failed):
             with self.assertRaisesRegex(RuntimeError, "Unknown encoder"):
-                aug.codec(sine(), 16000)
+                aug.codec(sine(), 16000, np.random.default_rng(42), mode="codec")
 
     def test_codec_timeout_has_clear_error(self):
         with patch.object(
             aug.subprocess, "run", side_effect=subprocess.TimeoutExpired("ffmpeg", 30)
         ):
             with self.assertRaisesRegex(RuntimeError, "FFmpeg unavailable or failed"):
-                aug.codec(sine(), 16000)
+                aug.codec(sine(), 16000, np.random.default_rng(42), mode="codec")
 
     @unittest.skipUnless(shutil.which("ffmpeg"), "FFmpeg executable unavailable")
     def test_real_g711_roundtrips(self):
@@ -526,13 +525,28 @@ class CodecTests(unittest.TestCase):
         original = clean.copy()
         for name in ("mulaw", "alaw"):
             with self.subTest(codec=name):
-                result = aug.codec(clean, 16000, name)
+                result = aug.codec(
+                    clean,
+                    16000,
+                    np.random.default_rng(42),
+                    mode="codec",
+                    name=name,
+                )
                 self.assertEqual(result.shape, clean.shape)
                 self.assertEqual(result.dtype, np.float32)
                 self.assertTrue(np.isfinite(result).all())
                 self.assertFalse(np.array_equal(result, clean))
                 self.assertGreater(measured_snr(clean, result), 25)
-                np.testing.assert_array_equal(result, aug.codec(clean, 16000, name))
+                np.testing.assert_array_equal(
+                    result,
+                    aug.codec(
+                        clean,
+                        16000,
+                        np.random.default_rng(42),
+                        mode="codec",
+                        name=name,
+                    ),
+                )
                 np.testing.assert_array_equal(clean, original)
 
     @unittest.skipUnless(shutil.which("ffmpeg"), "FFmpeg executable unavailable")
