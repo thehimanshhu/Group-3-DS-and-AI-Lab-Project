@@ -1,0 +1,47 @@
+# V-10: all augmentation effects together (Table B), including random time
+# offset. Everything else is configs/default.yaml plus the common sweep
+# protocol (tuning subset, 3 epochs).
+run_id: V-10
+seed: 42
+
+experiment:
+  owner: Vikram
+  param: augment
+  value: "all"
+
+data:
+  manifest: manifests/manifest_m4.csv
+  sample_rate: 16000
+  crop_seconds: 4.0
+  tune_subset: true
+
+model:
+  name: facebook/wav2vec2-xls-r-300m
+  freeze_feature_encoder: true
+  freeze_transformer_layers: 0
+  pooling: mean
+  dropout: 0.1
+
+train:
+  epochs: 3
+  batch_size: 8
+  grad_accum_steps: 1
+  lr_encoder: 1.0e-5
+  lr_head: 1.0e-3
+  weight_decay: 0.01
+  scheduler: cosine
+  warmup_ratio: 0.1
+  grad_clip_norm: 1.0
+  fp16: true
+  class_weights: from_train
+  early_stopping_patience: 2
+
+augment:
+  speed: {enabled: true}
+  pitch: {enabled: true}
+  shift: {enabled: true}
+  reverb: {enabled: true}
+  rawboost: {enabled: true}
+  noise: {enabled: true}
+  gain: {enabled: true}
+  channel: {enabled: true, mode: phone}
