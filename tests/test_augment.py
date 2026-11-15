@@ -5,16 +5,16 @@ Run from the repository root:
 FFmpeg integration tests skip when the executable is unavailable.
 """
 
-from contextlib import ExitStack
-from dataclasses import asdict
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import ExitStack
+from dataclasses import asdict
+from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -22,7 +22,7 @@ import numpy as np
 # Support repository-root discovery and direct execution after relocation.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src import augment as aug  # noqa: E402
+from src import augment as aug
 
 
 def sine(seconds=1.0, frequency=440.0, amplitude=0.2):
