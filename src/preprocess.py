@@ -6,9 +6,11 @@ edge silence or loudness:
 1. decode and mix to mono (m4a through ffmpeg)
 2. resample to 16 kHz, the rate XLS-R was pretrained on
 3. trim silence at the start and end (20 ms frames more than 40 dB below the loudest frame)
-4. drop the clip if less than 1 s is left
-5. normalise loudness to -20 dBFS RMS, with the peak at most 0.99
-6. store as 16-bit PCM WAV; the SHA-1 of the samples finds exact duplicates
+4. cut the first 30 ms and trim again (Milestone 4): almost every real Kathbath recording starts with a click, which
+   the first trim lands on; no fake source has it, so it would give the label away
+5. drop the clip if less than 1 s is left
+6. normalise loudness to -20 dBFS RMS, with the peak at most 0.99
+7. store as 16-bit PCM WAV; the SHA-1 of the samples finds exact duplicates
 
 Usage from code:   wave = preprocess(open(path, "rb").read())
 From the shell:    python -m src.preprocess <input audio> <output.wav>
@@ -30,6 +32,7 @@ TARGET_DBFS = -20.0
 SILENCE_DB = 40
 FRAME_S = 0.02
 MIN_SECONDS = 1.0
+START_CUT_S = 0.03   # the Kathbath click lies 5-10 ms after the first trim
 
 
 def decode(data):
@@ -66,6 +69,11 @@ def trim_silence(audio):
     return audio[voiced[0] * frame:(voiced[-1] + 1) * frame]
 
 
+def cut_start(audio):
+    """Cut the first 30 ms of a trimmed clip and trim its start again (removes the Kathbath click)."""
+    return trim_silence(audio[int(START_CUT_S * TARGET_SR):])
+
+
 def normalise(audio):
     rms = np.sqrt(np.mean(audio ** 2))
     if rms == 0:
@@ -78,7 +86,7 @@ def normalise(audio):
 def to_pcm16(data):
     """Raw file bytes -> (int16 samples at 16 kHz, or None if the clip is dropped; original sample rate)."""
     audio, sr = decode(data)
-    audio = trim_silence(resample(audio, sr))
+    audio = cut_start(trim_silence(resample(audio, sr)))
     if len(audio) < MIN_SECONDS * TARGET_SR:
         return None, sr
     return np.round(normalise(audio) * 32767).astype(np.int16), sr
