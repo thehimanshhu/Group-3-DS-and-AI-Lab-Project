@@ -1,0 +1,13 @@
+{
+ "run_id": "A-01",
+ "owner": "Amit",
+ "param": "model.name",
+ "value": "lfcc_lcnn",
+ "epochs": 10,
+ "best_epoch": 10,
+ "train_eer": 0.002,
+ "best_valid_eer": 0.02379,
+ "train_minutes": 21.3,
+ "git_commit": "51b7f84",
+ "kaggle_notebook": "https://www.kaggle.com/code/amit1506/milestone-4-baselines-a-01-and-a-02"
+}
