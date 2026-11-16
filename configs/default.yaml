@@ -33,9 +33,12 @@ train:
   class_weights: from_train             # computed from the train split only
   early_stopping_patience: 2            # on valid EER
 
-augment:
-  noise: false
-  gain: false
-  rawboost: false
-  codec: false
-  time_offset: false
+augment:               # every effect is off; an enabled effect fires with p=0.5
+  speed: {enabled: false}
+  pitch: {enabled: false}
+  shift: {enabled: false}
+  reverb: {enabled: false}
+  rawboost: {enabled: false}
+  noise: {enabled: false}
+  gain: {enabled: false}
+  channel: {enabled: false}
