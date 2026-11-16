@@ -1,0 +1,13 @@
+{
+ "run_id": "T-03",
+ "owner": "Tarika",
+ "param": "train.lr_encoder",
+ "value": 3e-05,
+ "epochs": 3,
+ "best_epoch": 2,
+ "train_eer": 0.002,
+ "best_valid_eer": 0.00303,
+ "train_minutes": 21.5,
+ "git_commit": "1beda5f",
+ "kaggle_notebook": "https://www.kaggle.com/code/tarikasubhashhedaoo/dsai-group3-m4-sweeps-a"
+}

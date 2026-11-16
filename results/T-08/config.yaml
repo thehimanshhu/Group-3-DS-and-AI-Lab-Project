@@ -1,0 +1,46 @@
+# T-08: 6 s crops (Table A).
+# Everything else is T-01 (configs/default.yaml with the sweep protocol: tuning subset, 3 epochs).
+run_id: T-08
+seed: 42
+
+experiment:
+  owner: Tarika
+  param: data.crop_seconds
+  value: 6.0
+
+data:
+  manifest: manifests/manifest_m4.csv
+  sample_rate: 16000
+  crop_seconds: 6.0
+  tune_subset: true
+
+model:
+  name: facebook/wav2vec2-xls-r-300m
+  freeze_feature_encoder: true
+  freeze_transformer_layers: 0
+  pooling: mean
+  dropout: 0.1
+
+train:
+  epochs: 3
+  batch_size: 8
+  grad_accum_steps: 1
+  lr_encoder: 1.0e-5
+  lr_head: 1.0e-3
+  weight_decay: 0.01
+  scheduler: cosine
+  warmup_ratio: 0.1
+  grad_clip_norm: 1.0
+  fp16: true
+  class_weights: from_train
+  early_stopping_patience: 2
+
+augment:
+  speed: {enabled: false}
+  pitch: {enabled: false}
+  shift: {enabled: false}
+  reverb: {enabled: false}
+  rawboost: {enabled: false}
+  noise: {enabled: false}
+  gain: {enabled: false}
+  channel: {enabled: false}

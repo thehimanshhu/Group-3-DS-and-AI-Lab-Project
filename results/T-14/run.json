@@ -1,0 +1,13 @@
+{
+ "run_id": "T-14",
+ "owner": "Tarika",
+ "param": "model.pooling",
+ "value": "attentive",
+ "epochs": 3,
+ "best_epoch": 1,
+ "train_eer": 0.007,
+ "best_valid_eer": 0.00454,
+ "train_minutes": 21.9,
+ "git_commit": "1beda5f",
+ "kaggle_notebook": "https://www.kaggle.com/code/tarikasubhashhedaoo/dsai-group3-m4-sweeps-b"
+}
