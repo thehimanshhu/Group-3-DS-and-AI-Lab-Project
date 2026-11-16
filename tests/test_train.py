@@ -155,6 +155,22 @@ class TrainingTests(unittest.TestCase):
         model = load_model(out / "best.pt", yaml.safe_load((out / "config.yaml").read_text()), "cpu")
         self.assertEqual(tuple(model(torch.randn(2, 32000), torch.ones(2, 32000, dtype=torch.long)).shape), (2, 2))
 
+    def test_the_baselines_train_through_the_same_script(self):
+        for name in ("lfcc_lcnn", "aasist_l"):
+            with self.subTest(model=name):
+                folder = Path(self.tmp.name) / name
+                folder.mkdir()
+                config = make_config(folder, epochs=1, lr_encoder=0.0)
+                cfg = yaml.safe_load(config.read_text())
+                cfg["model"] = {"name": name}
+                config.write_text(yaml.safe_dump(cfg))
+                result = train(config, self.data, folder / "out")
+                self.assertEqual(result.returncode, 0, result.stderr[-2000:])
+                self.assertTrue((folder / "out" / "run.json").exists())
+                model = load_model(folder / "out" / "best.pt", cfg, "cpu")
+                logits = model(torch.randn(2, 32000), torch.ones(2, 32000, dtype=torch.long))
+                self.assertEqual(tuple(logits.shape), (2, 2))
+
     def test_stop_and_resume(self):
         out = Path(self.tmp.name) / "out"
         config = make_config(Path(self.tmp.name), epochs=3, early_stopping_patience=None)

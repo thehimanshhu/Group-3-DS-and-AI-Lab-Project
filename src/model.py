@@ -1,4 +1,5 @@
-"""XLS-R 300M with a small classification head (Milestone 3 design, configurable for Milestone 4).
+"""XLS-R 300M with a small classification head (Milestone 3 design, configurable for Milestone 4),
+and the two baselines (model.name "lfcc_lcnn" or "aasist_l"), all with the same interface.
 
     model = build_model(cfg["model"])
     logits = model(wave, mask)        # wave [B, samples] float, mask [B, samples] 1 = audio, 0 = padding
@@ -70,7 +71,32 @@ class Detector(nn.Module):
         return encoder, new
 
 
+class Baseline(nn.Module):
+    """A baseline trained from scratch (LFCC-LCNN or AASIST-L), with the detector's interface."""
+
+    def __init__(self, name):
+        super().__init__()
+        if name == "lfcc_lcnn":
+            from src.baselines.lfcc_lcnn import LFCCLCNN
+            self.net = LFCCLCNN()
+        else:
+            from src.baselines.aasist_l import AASISTL
+            self.net = AASISTL()
+
+    def forward(self, wave, mask):
+        return self.net(wave, mask)
+
+    def parameter_groups(self):
+        """No pretrained encoder: every weight is new and uses train.lr_head."""
+        return [], [p for p in self.parameters() if p.requires_grad]
+
+
+BASELINES = ("lfcc_lcnn", "aasist_l")
+
+
 def build_model(model_cfg):
+    if model_cfg.get("name") in BASELINES:
+        return Baseline(model_cfg["name"])
     return Detector(name=model_cfg.get("name", "facebook/wav2vec2-xls-r-300m"),
                     freeze_feature_encoder=model_cfg.get("freeze_feature_encoder", True),
                     freeze_transformer_layers=model_cfg.get("freeze_transformer_layers", 0),

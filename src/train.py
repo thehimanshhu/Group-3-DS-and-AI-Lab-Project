@@ -143,8 +143,9 @@ def main():
     loss_fn = nn.CrossEntropyLoss(weight=torch.tensor(weights, dtype=torch.float32, device=device))
     print(f"train clips {counts.to_dict()}, class weights (real, fake) {np.round(weights, 3).tolist()}")
 
-    optimizer = torch.optim.AdamW([{"params": encoder_params, "lr": tr["lr_encoder"]},
-                                   {"params": new_params, "lr": tr["lr_head"]}], weight_decay=tr.get("weight_decay", 0.0))
+    groups = [{"params": encoder_params, "lr": tr["lr_encoder"]}, {"params": new_params, "lr": tr["lr_head"]}]
+    optimizer = torch.optim.AdamW([g for g in groups if g["params"]],  # the baselines have no pretrained encoder
+                                  weight_decay=tr.get("weight_decay", 0.0))
     accum = tr.get("grad_accum_steps", 1)
     train_data = loader(rows["train"], args.data, cfg, True, tr["batch_size"])
     eval_batch = 2 * tr["batch_size"]
