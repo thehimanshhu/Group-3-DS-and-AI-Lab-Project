@@ -1,0 +1,13 @@
+{
+ "run_id": "V-05",
+ "owner": "Vikram",
+ "param": "train.weight_decay",
+ "value": 0.1,
+ "epochs": 3,
+ "best_epoch": 2,
+ "train_eer": 0.006,
+ "best_valid_eer": 0.00911,
+ "train_minutes": 21.4,
+ "git_commit": "51b7f84",
+ "kaggle_notebook": "https://www.kaggle.com/code/viknegi/m4-training-notebook-1"
+}
