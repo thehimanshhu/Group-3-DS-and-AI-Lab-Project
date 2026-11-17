@@ -34,5 +34,5 @@ data/m4/
     └── dropped.csv
 ```
 
-It is uploaded as the private Kaggle dataset `dsai-group3-m4-data`, which `02_training.ipynb` and
-`03_training_and_evaluation.ipynb` read.
+It is uploaded as the private Kaggle dataset `dsai-group3-m4-data`, which `02_training.ipynb`,
+`02b_training.ipynb` and `03_training_and_evaluation.ipynb` read.
