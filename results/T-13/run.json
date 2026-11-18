@@ -1,0 +1,13 @@
+{
+ "run_id": "T-13",
+ "owner": "Tarika",
+ "param": "train.grad_accum_steps",
+ "value": 4,
+ "epochs": 3,
+ "best_epoch": 2,
+ "train_eer": 0.028,
+ "best_valid_eer": 0.02398,
+ "train_minutes": 19.4,
+ "git_commit": "1beda5f",
+ "kaggle_notebook": "https://www.kaggle.com/code/tarikasubhashhedaoo/dsai-group3-m4-sweeps-b"
+}

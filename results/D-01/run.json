@@ -1,0 +1,13 @@
+{
+ "run_id": "D-01",
+ "owner": "Tarika",
+ "param": null,
+ "value": null,
+ "epochs": 4,
+ "best_epoch": 2,
+ "train_eer": 0.0,
+ "best_valid_eer": 0.00253,
+ "train_minutes": 137.5,
+ "git_commit": "51b7f84",
+ "kaggle_notebook": "https://www.kaggle.com/code/tarikasubhashhedaoo/dsai-group3-m4-default-runs"
+}
