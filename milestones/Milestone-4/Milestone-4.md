@@ -167,13 +167,12 @@ Both are trained with the same training script, data, splits, crops, class weigh
 | One epoch on the full `train` split | About 35 min (default config); 41 min with phone-channel augmentation |
 | Final runs | 3–4.5 h each (4–6 epochs, early stopping) |
 | One sweep run (tuning subset, 3 epochs) | About 20 min |
-| GPU budget | About 30 T4-hours per account per week, four accounts |
 
 ### 4.4 Training Strategy
 
 - **Sweeps on a tuning subset.** Each hyperparameter was tried at 3–4 values on the fixed 5,000-clip tuning subset for 3 epochs, changing one setting at a time, then the winning settings were combined for the final runs on the full data.
 - **Validation only for choices.** Settings and the best epoch were chosen on `valid` EER; the test sets were never used for choosing.
-- **One config per run.** Every run is a YAML file in `configs/`, and `src/train.py` turns one config into one run, so 35 runs could be shared across four Kaggle accounts without conflicts.
+- **One config per run.** Every run is defined by one YAML file in `configs/`, and every run records the git commit it used, so each result can be traced to its exact settings and code.
 - **Three seeds** for the final config, so that the spread caused by training randomness can be reported.
 
 ---
@@ -442,7 +441,6 @@ For the fake clip, the model reacts mostly to the quiet gaps between words, wher
 | The model carries over to unseen languages | 2.7–3.9% EER on a language left out of training |
 | Phone-channel augmentation | Clear validation gain; phone-channel test at 0.0% |
 | Checking the data for shortcuts | Found and removed a near-perfect real-class marker (ROC AUC 1.000 from 20 ms) |
-| One config and one result folder per run | Four people ran 35 experiments on four Kaggle accounts without conflicts |
 
 ### 9.2 What Did Not Perform as Expected
 
@@ -458,7 +456,7 @@ For the fake clip, the model reacts mostly to the quiet gaps between words, wher
 
 | Bottleneck | Effect |
 | --- | --- |
-| GPU time | About 30 free T4-hours per account per week, two sessions at a time; a full-data epoch takes 35–41 min, and scoring one XLS-R model on 8,800 clips with several windows each takes about 30 min |
+| GPU time | A full-data epoch takes 35–41 min on 2 × T4, and scoring one XLS-R model on 8,800 clips with several windows each takes about 30 min. This limited the sweeps to a 5,000-clip subset and 3 epochs, and the final config to three seeds |
 
 ### 9.4 Plans for Improvement
 
