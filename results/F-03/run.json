@@ -1,0 +1,13 @@
+{
+ "run_id": "F-03",
+ "owner": "Himanshu",
+ "param": null,
+ "value": "final config",
+ "epochs": 6,
+ "best_epoch": 4,
+ "train_eer": 0.0,
+ "best_valid_eer": 0.0,
+ "train_minutes": 249.3,
+ "git_commit": "972740c",
+ "kaggle_notebook": "https://www.kaggle.com/code/viknegi/m4-training-notebook-3"
+}
