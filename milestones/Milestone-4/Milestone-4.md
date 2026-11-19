@@ -459,8 +459,6 @@ For the fake clip, the model reacts mostly to the quiet gaps between words, wher
 | Bottleneck | Effect |
 | --- | --- |
 | GPU time | About 30 free T4-hours per account per week, two sessions at a time; a full-data epoch takes 35–41 min, and scoring one XLS-R model on 8,800 clips with several windows each takes about 30 min |
-| Kaggle logistics | Running sessions can't be stopped from the command line, private outputs must be shared before another account can use them, sessions stop after 12 h |
-| Local memory | Preparing about 38,000 clips on a laptop needed bounded downloads and a resumable build |
 
 ### 9.4 Plans for Improvement
 
