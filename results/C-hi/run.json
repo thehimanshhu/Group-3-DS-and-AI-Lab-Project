@@ -1,0 +1,13 @@
+{
+ "run_id": "C-hi",
+ "owner": "Tarika",
+ "param": "data.exclude_language",
+ "value": "hi",
+ "epochs": 3,
+ "best_epoch": 1,
+ "train_eer": 0.0,
+ "best_valid_eer": 0.00339,
+ "train_minutes": 78.1,
+ "git_commit": "318e749",
+ "kaggle_notebook": "https://www.kaggle.com/code/tarikasubhashhedaoo/dsai-group3-m4-crosslang-v2"
+}

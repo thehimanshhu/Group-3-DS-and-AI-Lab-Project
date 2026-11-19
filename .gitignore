@@ -8,3 +8,11 @@ checkpoints/
 *.pt
 *.ckpt
 __pycache__/
+
+# Milestone 4: editor skills should stay out of git
+skills/
+milestone-4-plan.md
+.venv/
+.ruff_cache/
+# Milestone 4: generated from results/*/run.json by src.collect_runs
+results/runs.csv

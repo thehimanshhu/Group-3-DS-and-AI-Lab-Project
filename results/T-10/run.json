@@ -1,0 +1,13 @@
+{
+ "run_id": "T-10",
+ "owner": "Tarika",
+ "param": "model.freeze_transformer_layers",
+ "value": 12,
+ "epochs": 3,
+ "best_epoch": 3,
+ "train_eer": 0.061,
+ "best_valid_eer": 0.06361,
+ "train_minutes": 19.2,
+ "git_commit": "1beda5f",
+ "kaggle_notebook": "https://www.kaggle.com/code/tarikasubhashhedaoo/dsai-group3-m4-sweeps-b"
+}

@@ -1,0 +1,49 @@
+# F-01: the final XLS-R config, seed 42.
+# Changes from configs/default.yaml, each a clear gain on valid EER in the sweeps (paired bootstrap, 95%):
+#   encoder lr 3e-5 (T-03), dropout 0.5 (V-03), weight decay 0.1 (V-05), codec / phone augmentation (V-09).
+# Full train split, up to 8 epochs, early stopping on valid EER.
+run_id: F-01
+seed: 42
+
+experiment:            # copied into run.json; fill in for every run
+  owner: Himanshu
+  param: null
+  value: final config
+
+data:
+  manifest: manifests/manifest_m4.csv   # found under /kaggle/input on Kaggle
+  sample_rate: 16000
+  crop_seconds: 4.0                     # random crop in training, middle crop otherwise
+  tune_subset: false
+
+model:
+  name: facebook/wav2vec2-xls-r-300m
+  freeze_feature_encoder: true          # CNN stays frozen
+  freeze_transformer_layers: 0          # bottom N transformer layers frozen
+  pooling: mean                         # mean over frames with audio (uses the attention mask)
+  dropout: 0.5                          # V-03
+
+train:
+  epochs: 8
+  batch_size: 8
+  grad_accum_steps: 1
+  lr_encoder: 3.0e-5                    # T-03
+  lr_head: 1.0e-3
+  weight_decay: 0.1                     # V-05
+  scheduler: cosine
+  warmup_ratio: 0.1
+  grad_clip_norm: 1.0
+  fp16: true
+  class_weights: from_train             # computed from the train split only
+  early_stopping_patience: 2            # on valid EER
+  epoch_eval: true                      # score train, valid and test samples after each epoch
+
+augment:               # every effect is off; an enabled effect fires with p=0.5
+  speed: {enabled: false}
+  pitch: {enabled: false}
+  shift: {enabled: false}
+  reverb: {enabled: false}
+  rawboost: {enabled: false}
+  noise: {enabled: false}
+  gain: {enabled: false}
+  channel: {enabled: true, mode: phone}  # V-09

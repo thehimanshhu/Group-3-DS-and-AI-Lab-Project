@@ -1,0 +1,13 @@
+{
+ "run_id": "A-02",
+ "owner": "Amit",
+ "param": "model.name",
+ "value": "aasist_l",
+ "epochs": 10,
+ "best_epoch": 8,
+ "train_eer": 0.04009,
+ "best_valid_eer": 0.07895,
+ "train_minutes": 145.9,
+ "git_commit": "51b7f84",
+ "kaggle_notebook": "https://www.kaggle.com/code/amit1506/milestone-4-baselines-a-01-and-a-02"
+}

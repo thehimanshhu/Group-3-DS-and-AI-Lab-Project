@@ -32,13 +32,22 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 │   │   ├── Milestone-2.md   # Dataset identification & preparation
 │   │   ├── worklog.md
 │   │   └── ...              # Presentation
-│   └── Milestone-3/
-│       ├── Milestone-3.md   # Model architecture & end-to-end pipeline check
+│   ├── Milestone-3/
+│   │   ├── Milestone-3.md   # Model architecture & end-to-end pipeline check
+│   │   ├── worklog.md
+│   │   └── Milestone-3-presentation.pdf
+│   └── Milestone-4/
+│       ├── Milestone-4.md   # Model training, hyperparameter experiments & regularization
 │       ├── worklog.md
-│       └── Milestone-3-presentation.pdf
+│       └── Milestone-4-presentation.pdf
 ├── notebooks/
 │   ├── Milestone-2/         # EDA notebooks, generation pipeline
-│   └── Milestone-3/         # Data preparation and pipeline-check notebooks, run outputs
+│   ├── Milestone-3/         # Data preparation and pipeline-check notebooks, run outputs
+│   └── Milestone-4/         # Data, training and final evaluation notebooks
+├── src/                     # Preprocessing, data loading, models, training, augmentation, evaluation, scoring
+├── configs/                 # One YAML config per training run
+├── results/                 # Logs, predictions and metrics of every run (one folder per run)
+├── tests/                   # Unit tests
 ├── data/README.md           # Layout of the (uncommitted) data folder and how to get it
 ├── requirements.txt         # Python dependencies
 └── scratchpad/              # Personal working notes of each member
@@ -51,9 +60,28 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 | 1 | [Problem definition & literature review](milestones/Milestone-1/Milestone-1.md) | 22 Oct | Done |
 | 2 | [Dataset preparation](milestones/Milestone-2/Milestone-2.md) | 29 Oct | Done |
 | 3 | [Model architecture](milestones/Milestone-3/Milestone-3.md) | 5 Nov | Done |
-| 4 | Model training | 19 Nov | Planned |
+| 4 | [Model training](milestones/Milestone-4/Milestone-4.md) | 19 Nov | Done |
 | 5 | Evaluation & analysis | 26 Nov | Planned |
 | 6 | Deployment & documentation | 10 Dec | Planned |
+
+## Milestone 4: Model Training
+
+- **Report:** [Milestone-4.md](milestones/Milestone-4/Milestone-4.md) · [Presentation](milestones/Milestone-4/Milestone-4-presentation.pdf) · [Worklog](milestones/Milestone-4/worklog.md)
+- **Notebooks** (saved with their outputs):
+  - [`01_data_preparation.ipynb`](notebooks/Milestone-4/01_data_preparation.ipynb): training and validation data, tuning subset, manifest and leakage checks
+  - [`01b_test_data.ipynb`](notebooks/Milestone-4/01b_test_data.ipynb): the five test sets and their Milestone-4 sample
+  - [`01c_click_fix.ipynb`](notebooks/Milestone-4/01c_click_fix.ipynb): finds and removes the click at the start of real Kathbath clips
+  - [`02_training.ipynb`](notebooks/Milestone-4/02_training.ipynb): runs a queue of training runs on Kaggle, one config each
+  - [`03_training_and_evaluation.ipynb`](notebooks/Milestone-4/03_training_and_evaluation.ipynb): baselines, hyperparameter experiments, augmentation, comparisons, metrics and sample outputs
+- **Runs:** one config per run in [`configs/`](configs/), and its logs, predictions and metrics in [`results/`](results/). Model weights stay in the Kaggle notebook that trained each run, linked in its `run.json`.
+
+**To reproduce a run:**
+
+1. `pip install -r requirements.txt`
+2. Optional: rebuild the data with `01_data_preparation.ipynb`, `01b_test_data.ipynb` and `01c_click_fix.ipynb`, or ask for access to the Kaggle dataset `dsai-group3-m4-data` (see [`data/README.md`](data/README.md)).
+3. Train: `python -m src.train --config configs/F-01.yaml --data <data folder> --out <output folder>`, or run `02_training.ipynb` on Kaggle (GPU T4 × 2, internet on) with `RUN_IDS = ["F-01"]`.
+4. Score: `python -m src.score F-01 --data <data folder> --checkpoints <folder with F-01/best.pt> --out <output folder>`, then run `03_training_and_evaluation.ipynb`.
+5. Tests: `python -m unittest discover -s tests -p 'test_*.py'`
 
 ## Milestone 3: Model Architecture and Pipeline Check
 

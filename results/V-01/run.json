@@ -1,0 +1,13 @@
+{
+ "run_id": "V-01",
+ "owner": "Vikram",
+ "param": "model.dropout",
+ "value": 0.0,
+ "epochs": 3,
+ "best_epoch": 3,
+ "train_eer": 0.002,
+ "best_valid_eer": 0.01265,
+ "train_minutes": 22.7,
+ "git_commit": "51b7f84",
+ "kaggle_notebook": "https://www.kaggle.com/code/viknegi/m4-training-notebook-1"
+}

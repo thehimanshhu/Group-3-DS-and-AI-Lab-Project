@@ -1,0 +1,13 @@
+{
+ "run_id": "V-06",
+ "owner": "Vikram",
+ "param": "augment",
+ "value": "noise + gain",
+ "epochs": 3,
+ "best_epoch": 2,
+ "train_eer": 0.011,
+ "best_valid_eer": 0.01518,
+ "train_minutes": 22.3,
+ "git_commit": "51b7f84",
+ "kaggle_notebook": "https://www.kaggle.com/code/viknegi/m4-training-notebook-2"
+}

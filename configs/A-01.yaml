@@ -1,0 +1,44 @@
+# A-01: LFCC-LCNN baseline (Table C), trained from scratch on the full train split.
+# LFCC features + light CNN with max-feature-map (Lavrentyeva et al., 2019). lr 1e-3 as in the baseline tests.
+# Same data, splits, crops, class weights and early stopping on valid EER as the XLS-R runs.
+run_id: A-01
+seed: 42
+
+experiment:
+  owner: Amit
+  param: model.name
+  value: lfcc_lcnn
+
+data:
+  manifest: manifests/manifest_m4.csv
+  sample_rate: 16000
+  crop_seconds: 4.0
+  tune_subset: false
+
+model:
+  name: lfcc_lcnn              # src/model.py builds the baseline; the XLS-R settings don't apply
+
+train:
+  epochs: 10
+  batch_size: 32
+  grad_accum_steps: 1
+  lr_encoder: 0.0              # no pretrained encoder
+  lr_head: 1.0e-3                # the learning rate of every weight
+  weight_decay: 0.0001
+  scheduler: cosine
+  warmup_ratio: 0.05
+  grad_clip_norm: 1.0
+  fp16: true
+  class_weights: from_train
+  early_stopping_patience: 3
+  num_workers: 4
+
+augment:
+  speed: {enabled: false}
+  pitch: {enabled: false}
+  shift: {enabled: false}
+  reverb: {enabled: false}
+  rawboost: {enabled: false}
+  noise: {enabled: false}
+  gain: {enabled: false}
+  channel: {enabled: false}

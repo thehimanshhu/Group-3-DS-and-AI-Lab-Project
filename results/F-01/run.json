@@ -1,0 +1,13 @@
+{
+ "run_id": "F-01",
+ "owner": "Himanshu",
+ "param": null,
+ "value": "final config",
+ "epochs": 5,
+ "best_epoch": 3,
+ "train_eer": 0.0,
+ "best_valid_eer": 0.0,
+ "train_minutes": 267.2,
+ "git_commit": "972740c",
+ "kaggle_notebook": "https://www.kaggle.com/code/tarikasubhashhedaoo/dsai-group3-m4-final-f01"
+}
