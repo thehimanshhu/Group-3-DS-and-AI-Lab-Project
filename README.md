@@ -38,7 +38,8 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 │   │   └── Milestone-3-presentation.pdf
 │   └── Milestone-4/
 │       ├── Milestone-4.md   # Model training, hyperparameter experiments & regularization
-│       └── worklog.md
+│       ├── worklog.md
+│       └── Milestone-4-presentation.pdf
 ├── notebooks/
 │   ├── Milestone-2/         # EDA notebooks, generation pipeline
 │   ├── Milestone-3/         # Data preparation and pipeline-check notebooks, run outputs
@@ -65,7 +66,7 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 
 ## Milestone 4: Model Training
 
-- **Report:** [Milestone-4.md](milestones/Milestone-4/Milestone-4.md) · [Worklog](milestones/Milestone-4/worklog.md)
+- **Report:** [Milestone-4.md](milestones/Milestone-4/Milestone-4.md) · [Presentation](milestones/Milestone-4/Milestone-4-presentation.pdf) · [Worklog](milestones/Milestone-4/worklog.md)
 - **Notebooks** (saved with their outputs):
   - [`01_data_preparation.ipynb`](notebooks/Milestone-4/01_data_preparation.ipynb): training and validation data, tuning subset, manifest and leakage checks
   - [`01b_test_data.ipynb`](notebooks/Milestone-4/01b_test_data.ipynb): the five test sets and their Milestone-4 sample
