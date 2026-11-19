@@ -475,16 +475,7 @@ For the fake clip, the model reacts mostly to the quiet gaps between words, wher
 
 ---
 
-## 10. Response to Milestone-3 Feedback
-
-| Feedback | Response |
-| --- | --- |
-| The repository has too many branches | The merged branches of Milestones 1–4 are deleted once this milestone is merged into `main`. Each member now works on one branch per milestone, merged by pull request |
-| Softmax over two logits vs sigmoid, and the attention mask for padding, were not explained | Explained in Section 3.2; a unit test confirms that padding does not change the score |
-
----
-
-## 11. Reproducibility
+## 10. Reproducibility
 
 | Item | How it's fixed |
 | --- | --- |
@@ -499,7 +490,7 @@ For the fake clip, the model reacts mostly to the quiet gaps between words, wher
 
 ---
 
-## 12. References
+## 11. References
 
 1. Babu, A., Wang, C., Tjandra, A., et al. (2021). _XLS-R: Self-supervised Cross-lingual Speech Representation Learning at Scale_. arXiv. <https://arxiv.org/abs/2111.09296>
 2. Jung, J., Heo, H. S., Tak, H., et al. (2022). _AASIST: Audio Anti-Spoofing using Integrated Spectro-Temporal Graph Attention Networks_. ICASSP 2022. <https://arxiv.org/abs/2110.01200>
