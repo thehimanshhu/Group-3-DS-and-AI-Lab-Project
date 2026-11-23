@@ -1,7 +1,7 @@
 """Score trained runs on valid and the Milestone-4 test sample (A-03).
 
-    python -m src.score --data <folder with manifests/> --checkpoints <folder(s) holding <run_id>/best.pt> \
-        --out <output folder> F-01 D-01 C-hi ...
+    python -m src.score --data <folder with manifests/> [<more clip folders>] \
+        --checkpoints <folder(s) holding <run_id>/best.pt> --out <output folder> [--full] F-01 D-01 C-hi ...
 
 For each run, writes into <out>/<run_id>/:
     predictions.csv   clip_id, split, language, dataset, generator, label, p_fake, p_fake_middle
@@ -48,6 +48,18 @@ def find_checkpoint(run_id, roots):
     raise FileNotFoundError(f"No {run_id}/best.pt under {roots}")
 
 
+def resolve_paths(rows, roots):
+    """Each clip's absolute path, from the first data folder that has it."""
+    roots = [Path(r).resolve() for r in roots]
+    paths = []
+    for p in rows.path:
+        found = next((root / p for root in roots if (root / p).exists()), None)
+        if found is None:
+            raise FileNotFoundError(f"{p} is in none of {[str(r) for r in roots]}")
+        paths.append(str(found))
+    return rows.assign(path=paths)
+
+
 def summarise(run_id, predictions, cfg):
     valid = predictions[predictions.split == "valid"]
     _, threshold = eer(valid.label.eq("fake").astype(int), valid.p_fake)
@@ -70,10 +82,15 @@ def summarise(run_id, predictions, cfg):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("runs", nargs="+")
-    parser.add_argument("--data", required=True)
+    parser.add_argument("--data", nargs="+", required=True,
+                        help="folder(s) with the clips; the first one holds manifests/. A clip is read from the "
+                             "first folder that has it (e.g. the main dataset plus the full English test sets)")
     parser.add_argument("--checkpoints", nargs="+", required=True)
     parser.add_argument("--out", required=True)
-    parser.add_argument("--limit", type=int, default=0, help="score at most this many clips per split (quick tests)")
+    parser.add_argument("--limit", type=int, default=0, help="score at most this many real and this many fake clips per split (quick tests)")
+    parser.add_argument("--full", action="store_true",
+                        help="score every test clip (Milestone 5), not just the Milestone-4 sample; writes "
+                             "predictions_full.csv.gz and results_full.json")
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -82,18 +99,23 @@ def main():
     for run_id in args.runs:
         start = time.time()
         cfg = run_config(run_id)
-        manifest = read_manifest(args.data, cfg["data"])
-        rows = manifest[(manifest.split == "valid") | manifest.m4_eval.astype(str).eq("True")]
+        manifest = read_manifest(args.data[0], cfg["data"])
+        if args.full:
+            rows = manifest[(manifest.split == "valid") | manifest.split.str.startswith("test_")]
+        else:
+            rows = manifest[(manifest.split == "valid") | manifest.m4_eval.astype(str).eq("True")]
         if args.limit:
-            rows = rows.groupby("split").head(args.limit)
+            rows = rows.groupby(["split", "label"]).head(args.limit)  # both classes in every split
+        rows = resolve_paths(rows.reset_index(drop=True), args.data)
         model = load_model(find_checkpoint(run_id, args.checkpoints), cfg, device)
-        predictions = score(model, rows.reset_index(drop=True), args.data, cfg["data"], device)[COLUMNS]
+        predictions = score(model, rows, "/", cfg["data"], device)[COLUMNS]
         predictions[["p_fake", "p_fake_middle"]] = predictions[["p_fake", "p_fake_middle"]].round(5)
         folder = Path(args.out) / run_id
         folder.mkdir(parents=True, exist_ok=True)
-        predictions.to_csv(folder / "predictions.csv", index=False)
-        results = summarise(run_id, predictions, cfg) | {"git_commit": commit}
-        (folder / "results.json").write_text(json.dumps(results, indent=1))
+        suffix = "_full" if args.full else ""
+        predictions.to_csv(folder / f"predictions{suffix}.csv{'.gz' if args.full else ''}", index=False)
+        results = summarise(run_id, predictions, cfg) | {"git_commit": commit, "clips": len(predictions)}
+        (folder / f"results{suffix}.json").write_text(json.dumps(results, indent=1))
         print(f"{run_id}: {len(predictions):,} clips in {(time.time() - start) / 60:.1f} min | EER "
               + ", ".join(f"{s} {v * 100:.1f}%" for s, v in results["eer"].items()), flush=True)
         del model
