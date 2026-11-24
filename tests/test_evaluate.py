@@ -139,3 +139,39 @@ class Milestone3AudioTests(unittest.TestCase):
         self.assertEqual(values.shape, self.audio.shape)
         self.assertTrue(np.isfinite(values).all())
         self.assertGreater(values.max(), 0)
+
+
+class BatchedScoringTests(unittest.TestCase):
+    """score() batches windows from many clips; it must give the same scores as one clip at a time."""
+
+    def test_batched_scores_match_clip_by_clip(self):
+        import tempfile
+
+        import soundfile as sf
+        import torch
+
+        from src.evaluate import _score_clip, score
+        from src.model import build_model
+
+        torch.manual_seed(0)
+        tiny = {"name": "tiny", "freeze_feature_encoder": True, "freeze_transformer_layers": 0,
+                "dropout": 0.1}
+        rng = np.random.default_rng(0)
+        # 1 s to 13 s: one window, padded windows, a tail window, a separate middle window
+        seconds = [1.0, 2.5, 4.0, 5.3, 7.9, 13.1, 3.2, 9.0]
+        for pooling in ("mean", "attentive"):
+            model = build_model({**tiny, "pooling": pooling}).eval()
+            with tempfile.TemporaryDirectory() as folder:
+                paths = []
+                for i, s in enumerate(seconds):
+                    sf.write(Path(folder) / f"{i}.wav", 0.1 * rng.standard_normal(int(SAMPLE_RATE * s)),
+                             SAMPLE_RATE, subtype="PCM_16")
+                    paths.append(f"{i}.wav")
+                rows = pd.DataFrame({"path": paths})
+                expected = [_score_clip(model, sf.read(Path(folder) / p, dtype="float32")[0], SAMPLE_RATE, "cpu")
+                            for p in paths]
+                for batch_size in (1, 3, 64):  # windows of one clip split over batches, and all in one
+                    got = score(model, rows, folder, {"sample_rate": SAMPLE_RATE, "crop_seconds": 4.0}, "cpu",
+                                batch_size=batch_size, workers=2)
+                    np.testing.assert_allclose(got[["p_fake", "p_fake_middle"]].to_numpy(), expected, atol=1e-5,
+                                               err_msg=f"{pooling}, batch {batch_size}")

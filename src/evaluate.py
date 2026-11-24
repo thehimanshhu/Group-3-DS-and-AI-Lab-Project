@@ -210,31 +210,93 @@ def _score_clip(model, audio: np.ndarray, sample_rate: int, device, crop_seconds
     )
 
 
-def score(model, rows: pd.DataFrame, data_dir, data_cfg: dict, device) -> pd.DataFrame:
-    """Score each processed WAV listed in the manifest."""
+def _clip_windows(audio: np.ndarray, window_size: int, hop_size: int):
+    """The sliding windows of one clip plus its middle window: (waves, masks, sliding count, middle index)."""
+    starts = _window_starts(len(audio), window_size, hop_size)
+    num_sliding_windows = len(starts)
+    middle_start = max(0, (len(audio) - window_size) // 2)
+    if middle_start not in starts:
+        starts.append(middle_start)
+    waves, masks = zip(*(_prepare_window(audio, start, window_size) for start in starts))
+    return waves, masks, num_sliding_windows, starts.index(middle_start)
+
+
+def score(model, rows: pd.DataFrame, data_dir, data_cfg: dict, device,
+          batch_size: int = 64, fp16: bool = True, workers: int = 16) -> pd.DataFrame:
+    """Score each processed WAV listed in the manifest.
+
+    p_fake is the mean fake probability over 4 s windows every 2 s, p_fake_middle the middle
+    window's. Windows from many clips go through the model together (batch_size windows), in
+    fp16 on a GPU, on every visible GPU, while worker threads read the next clips. The scores
+    match scoring clip by clip in fp32 (_score_clip) up to fp16 rounding.
+    """
+    from concurrent.futures import ThreadPoolExecutor
     from pathlib import Path
 
     import soundfile as sf
+    import torch
 
     data_dir = Path(data_dir)
     sample_rate = data_cfg.get("sample_rate", 16_000)
-    crop_seconds = data_cfg.get("crop_seconds", 4.0)
+    window_size = round(data_cfg.get("crop_seconds", 4.0) * sample_rate)
+    hop_size = 2 * sample_rate
+    device = torch.device(device)
     model.eval()
+    net = model
+    if device.type == "cuda" and fp16:
+        class Half(torch.nn.Module):
+            """fp16 autocast inside forward, so it also holds in DataParallel's worker threads."""
 
-    window_scores = []
-    middle_scores = []
+            def __init__(self, inner):
+                super().__init__()
+                self.inner = inner
 
-    for relative_path in rows["path"]:
+            def forward(self, wave, mask):
+                with torch.autocast("cuda", dtype=torch.float16):
+                    return self.inner(wave, mask).float()
+
+        net = Half(net)
+    if device.type == "cuda" and torch.cuda.device_count() > 1:
+        net = torch.nn.DataParallel(net)
+
+    def load(relative_path):
         path = data_dir / relative_path
         audio, actual_rate = sf.read(path, dtype="float32")
-
         if actual_rate != sample_rate or audio.ndim != 1:
             raise ValueError(f"Expected mono audio at {sample_rate} Hz: {path}")
+        return _clip_windows(audio, window_size, hop_size)
 
-        window_score, middle_score = _score_clip(
-            model, audio, sample_rate, device, crop_seconds
-        )
-        window_scores.append(window_score)
-        middle_scores.append(middle_score)
+    probs = []  # fake probability of every window, in order
+    layout = []  # per clip: (first window, sliding windows, middle index)
+    waves, masks = [], []
 
+    def run_batch(n):
+        with torch.inference_mode():
+            wave = torch.from_numpy(np.stack(waves[:n])).to(device)
+            mask = torch.from_numpy(np.stack(masks[:n])).to(device)
+            probs.append(net(wave, mask).float().softmax(dim=1)[:, 1].cpu().numpy())
+        del waves[:n], masks[:n]
+
+    total = 0
+    with ThreadPoolExecutor(workers) as pool:
+        paths = list(rows["path"])
+        chunk = 512  # clips read ahead at a time, so memory stays small
+        pending = pool.map(load, paths[:chunk])
+        for begin in range(0, len(paths), chunk):
+            current = pending
+            if begin + chunk < len(paths):
+                pending = pool.map(load, paths[begin + chunk : begin + 2 * chunk])
+            for clip_waves, clip_masks, num_sliding, middle in current:
+                layout.append((total, num_sliding, middle))
+                total += len(clip_waves)
+                waves.extend(clip_waves)
+                masks.extend(clip_masks)
+                while len(waves) >= batch_size:
+                    run_batch(batch_size)
+        if waves:
+            run_batch(len(waves))
+
+    window_probs = np.concatenate(probs) if probs else np.zeros(0)
+    window_scores = [float(window_probs[first : first + n].mean()) for first, n, _ in layout]
+    middle_scores = [float(window_probs[first + middle]) for first, _, middle in layout]
     return rows.assign(p_fake=window_scores, p_fake_middle=middle_scores)

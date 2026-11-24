@@ -14,6 +14,7 @@ The config comes from results/<run_id>/config.yaml (or configs/<run_id>.yaml).
 """
 import argparse
 import json
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -51,12 +52,20 @@ def find_checkpoint(run_id, roots):
 def resolve_paths(rows, roots):
     """Each clip's absolute path, from the first data folder that has it."""
     roots = [Path(r).resolve() for r in roots]
+    listed = {}  # (root, folder) -> file names; one listing per folder instead of one check per clip (slow on Kaggle)
+
+    def has(root, p):
+        folder = (root / p).parent
+        if folder not in listed:
+            listed[folder] = {e.name for e in os.scandir(folder)} if folder.is_dir() else set()
+        return Path(p).name in listed[folder]
+
     paths = []
     for p in rows.path:
-        found = next((root / p for root in roots if (root / p).exists()), None)
-        if found is None:
+        root = next((r for r in roots if has(r, p)), None)
+        if root is None:
             raise FileNotFoundError(f"{p} is in none of {[str(r) for r in roots]}")
-        paths.append(str(found))
+        paths.append(str(root / p))
     return rows.assign(path=paths)
 
 
@@ -88,10 +97,14 @@ def main():
     parser.add_argument("--checkpoints", nargs="+", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--limit", type=int, default=0, help="score at most this many real and this many fake clips per split (quick tests)")
+    parser.add_argument("--batch-size", type=int, default=64, help="audio windows per forward pass (split over all GPUs)")
+    parser.add_argument("--fp32", action="store_true", help="score in fp32 (about 2.5x slower; fp16 moves only borderline scores)")
     parser.add_argument("--full", action="store_true",
                         help="score every test clip (Milestone 5), not just the Milestone-4 sample; writes "
                              "predictions_full.csv.gz and results_full.json")
     args = parser.parse_args()
+    if args.batch_size < 1:
+        parser.error("--batch-size must be at least 1")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     commit = subprocess.run(["git", "-C", str(REPO), "rev-parse", "--short", "HEAD"],
@@ -108,7 +121,8 @@ def main():
             rows = rows.groupby(["split", "label"]).head(args.limit)  # both classes in every split
         rows = resolve_paths(rows.reset_index(drop=True), args.data)
         model = load_model(find_checkpoint(run_id, args.checkpoints), cfg, device)
-        predictions = score(model, rows, "/", cfg["data"], device)[COLUMNS]
+        predictions = score(model, rows, "/", cfg["data"], device, batch_size=args.batch_size,
+                            fp16=not args.fp32)[COLUMNS]
         predictions[["p_fake", "p_fake_middle"]] = predictions[["p_fake", "p_fake_middle"]].round(5)
         folder = Path(args.out) / run_id
         folder.mkdir(parents=True, exist_ok=True)
