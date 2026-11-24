@@ -180,61 +180,73 @@ def _prepare_window(
     return wave, mask
 
 
-def _score_clip(model, audio: np.ndarray, sample_rate: int, device, crop_seconds=4.0):
-    """Return (mean sliding-window fake probability, middle-window fake probability)."""
-    import torch
-
-    window_size = round(crop_seconds * sample_rate)
-    hop_size = 2 * sample_rate
-    starts = _window_starts(len(audio), window_size, hop_size)
-    num_sliding_windows = len(starts)
-
-    middle_start = max(0, (len(audio) - window_size) // 2)
-    if middle_start not in starts:
-        starts.append(middle_start)
-    middle_index = starts.index(middle_start)
-
-    waves, masks = zip(*(
-        _prepare_window(audio, start, window_size) for start in starts
-    ))
-    wave_batch = torch.from_numpy(np.stack(waves)).to(device)
-    mask_batch = torch.from_numpy(np.stack(masks)).to(device)
-
-    with torch.inference_mode():
-        logits = model(wave_batch, mask_batch)
-        fake_probs = logits.softmax(dim=1)[:, 1]
-
-    return (
-        fake_probs[:num_sliding_windows].mean().item(),
-        fake_probs[middle_index].item(),
-    )
-
-
-def score(model, rows: pd.DataFrame, data_dir, data_cfg: dict, device) -> pd.DataFrame:
-    """Score each processed WAV listed in the manifest."""
+def score(
+    model, rows: pd.DataFrame, data_dir, data_cfg: dict, device,
+    *, batch_size: int = 16, fp16: bool = False,
+) -> pd.DataFrame:
+    """Score manifest WAVs in batches of windows, optionally with CUDA fp16."""
     from pathlib import Path
 
     import soundfile as sf
+    import torch
+
+    if batch_size < 1:
+        raise ValueError("batch_size must be at least 1 window.")
 
     data_dir = Path(data_dir)
+    device = torch.device(device)
     sample_rate = data_cfg.get("sample_rate", 16_000)
-    crop_seconds = data_cfg.get("crop_seconds", 4.0)
+    window_size = round(data_cfg.get("crop_seconds", 4.0) * sample_rate)
+    hop_size = 2 * sample_rate
     model.eval()
 
-    window_scores = []
-    middle_scores = []
+    score_sums = np.zeros(len(rows))
+    window_counts = np.zeros(len(rows), dtype=np.int64)
+    middle_scores = np.empty(len(rows))
+    waves, masks, window_locations = [], [], []
 
-    for relative_path in rows["path"]:
-        path = data_dir / relative_path
-        audio, actual_rate = sf.read(path, dtype="float32")
+    def flush_batch():
+        wave_batch = torch.from_numpy(np.stack(waves)).to(device)
+        mask_batch = torch.from_numpy(np.stack(masks)).to(device)
+        logits = model(wave_batch, mask_batch)
+        probabilities = logits.float().softmax(dim=1)[:, 1].cpu().tolist()
 
-        if actual_rate != sample_rate or audio.ndim != 1:
-            raise ValueError(f"Expected mono audio at {sample_rate} Hz: {path}")
+        for (clip_index, is_sliding, is_middle), probability in zip(window_locations, probabilities):
+            if is_sliding:
+                score_sums[clip_index] += probability
+            if is_middle:
+                middle_scores[clip_index] = probability
+        waves.clear()
+        masks.clear()
+        window_locations.clear()
 
-        window_score, middle_score = _score_clip(
-            model, audio, sample_rate, device, crop_seconds
-        )
-        window_scores.append(window_score)
-        middle_scores.append(middle_score)
+    use_fp16 = fp16 and device.type == "cuda"
+    # Keep one autocast context so eligible model weights can be reused across batches.
+    with torch.inference_mode(), torch.autocast("cuda", dtype=torch.float16, enabled=use_fp16):
+        for clip_index, relative_path in enumerate(rows["path"]):
+            path = data_dir / relative_path
+            audio, actual_rate = sf.read(path, dtype="float32")
 
-    return rows.assign(p_fake=window_scores, p_fake_middle=middle_scores)
+            if actual_rate != sample_rate or audio.ndim != 1:
+                raise ValueError(f"Expected mono audio at {sample_rate} Hz: {path}")
+
+            starts = _window_starts(len(audio), window_size, hop_size)
+            middle_start = max(0, (len(audio) - window_size) // 2)
+            sliding_count = window_counts[clip_index] = len(starts)
+            if middle_start not in starts:
+                starts.append(middle_start)
+
+            for index, start in enumerate(starts):
+                wave, mask = _prepare_window(audio, start, window_size)
+                waves.append(wave)
+                masks.append(mask)
+                window_locations.append((
+                    clip_index, index < sliding_count, start == middle_start
+                ))
+                if len(waves) == batch_size:
+                    flush_batch()
+
+        if waves:
+            flush_batch()
+
+    return rows.assign(p_fake=score_sums / window_counts, p_fake_middle=middle_scores)

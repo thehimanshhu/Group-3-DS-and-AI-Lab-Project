@@ -88,10 +88,14 @@ def main():
     parser.add_argument("--checkpoints", nargs="+", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--limit", type=int, default=0, help="score at most this many real and this many fake clips per split (quick tests)")
+    parser.add_argument("--batch-size", type=int, default=16, help="maximum audio windows per forward pass")
+    parser.add_argument("--fp32", action="store_true", help="disable CUDA mixed precision for scoring")
     parser.add_argument("--full", action="store_true",
                         help="score every test clip (Milestone 5), not just the Milestone-4 sample; writes "
                              "predictions_full.csv.gz and results_full.json")
     args = parser.parse_args()
+    if args.batch_size < 1:
+        parser.error("--batch-size must be at least 1")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     commit = subprocess.run(["git", "-C", str(REPO), "rev-parse", "--short", "HEAD"],
@@ -108,7 +112,10 @@ def main():
             rows = rows.groupby(["split", "label"]).head(args.limit)  # both classes in every split
         rows = resolve_paths(rows.reset_index(drop=True), args.data)
         model = load_model(find_checkpoint(run_id, args.checkpoints), cfg, device)
-        predictions = score(model, rows, "/", cfg["data"], device)[COLUMNS]
+        predictions = score(
+            model, rows, "/", cfg["data"], device, batch_size=args.batch_size,
+            fp16=not args.fp32 and cfg["train"].get("fp16", True),
+        )[COLUMNS]
         predictions[["p_fake", "p_fake_middle"]] = predictions[["p_fake", "p_fake_middle"]].round(5)
         folder = Path(args.out) / run_id
         folder.mkdir(parents=True, exist_ok=True)
