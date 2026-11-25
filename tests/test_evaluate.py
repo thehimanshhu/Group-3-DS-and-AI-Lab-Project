@@ -4,7 +4,6 @@ Set M3_DATA_DIR and M3_CHECKPOINT to enable the real-audio checks.
 """
 
 import os
-import tempfile
 import unittest
 from pathlib import Path
 
@@ -12,13 +11,10 @@ import numpy as np
 import pandas as pd
 
 from src.evaluate import (
-    _prepare_window,
-    _window_starts,
     compare_source_thresholds,
     evaluate_generators,
     evaluate_languages,
     evaluate_splits,
-    score,
 )
 from src.metrics import eer
 
@@ -64,80 +60,6 @@ class EvaluationReportTests(unittest.TestCase):
         languages = evaluate_languages(self.predictions)
         english = languages.loc[languages["language"].eq("en")]
         self.assertEqual(set(english["split"]), {"test_asvspoof", "test_itw"})
-
-
-class BatchedScoringTests(unittest.TestCase):
-    def test_batched_scores_match_original_clip_by_clip_fp32(self):
-        import soundfile as sf
-        import torch
-
-        class WindowModel(torch.nn.Module):
-            def __init__(self):
-                super().__init__()
-                self.projection = torch.nn.Linear(2, 2, bias=False)
-                with torch.no_grad():
-                    self.projection.weight.copy_(torch.tensor([[0.0, 0.0], [0.4, 0.3]]))
-                self.batch_sizes = []
-
-            def forward(self, wave, mask):
-                self.batch_sizes.append(len(wave))
-                features = torch.stack((wave[:, 0], mask.float().mean(dim=1)), dim=1)
-                return self.projection(features)
-
-        sample_rate = 100
-        window_size = 4 * sample_rate
-        generator = np.random.default_rng(42)
-        # Short, exact window, off-grid tail with a distinct center, and long enough
-        # for one clip to span several batches.
-        clips = [generator.normal(size=length) for length in (210, 400, 650, 1450)]
-        rows = pd.DataFrame(
-            {"path": [f"{index}.wav" for index in range(len(clips))]},
-            index=[5, 2, 5, 8],
-        )
-        devices = ["cpu"]
-        if torch.cuda.is_available():
-            devices.append("cuda")
-
-        with tempfile.TemporaryDirectory() as folder:
-            for path, audio in zip(rows["path"], clips):
-                sf.write(Path(folder) / path, audio, sample_rate, subtype="FLOAT")
-
-            for device in devices:
-                with self.subTest(device=device):
-                    model = WindowModel().to(device).eval()
-                    reference = []
-                    with torch.inference_mode():
-                        for path in rows["path"]:
-                            audio, _ = sf.read(Path(folder) / path, dtype="float32")
-                            starts = _window_starts(len(audio), window_size, 2 * sample_rate)
-                            sliding_count = len(starts)
-                            middle = max(0, (len(audio) - window_size) // 2)
-                            if middle not in starts:
-                                starts.append(middle)
-                            waves, masks = zip(*(
-                                _prepare_window(audio, start, window_size) for start in starts
-                            ))
-                            logits = model(
-                                torch.tensor(np.stack(waves), device=device),
-                                torch.tensor(np.stack(masks), device=device),
-                            )
-                            probabilities = logits.softmax(dim=1)[:, 1]
-                            reference.append([
-                                probabilities[:sliding_count].mean().item(),
-                                probabilities[starts.index(middle)].item(),
-                            ])
-
-                    model.batch_sizes.clear()
-                    result = score(
-                        model, rows, folder, {"sample_rate": sample_rate}, device,
-                        batch_size=3, fp16=device == "cuda",
-                    )
-                    pd.testing.assert_frame_equal(result[rows.columns], rows)
-                    np.testing.assert_allclose(
-                        result[["p_fake", "p_fake_middle"]], reference,
-                        atol=1e-3, rtol=0,
-                    )
-                    self.assertEqual(model.batch_sizes, [3, 3, 3, 3, 2])
 
 
 class Milestone3AudioTests(unittest.TestCase):
@@ -217,3 +139,39 @@ class Milestone3AudioTests(unittest.TestCase):
         self.assertEqual(values.shape, self.audio.shape)
         self.assertTrue(np.isfinite(values).all())
         self.assertGreater(values.max(), 0)
+
+
+class BatchedScoringTests(unittest.TestCase):
+    """score() batches windows from many clips; it must give the same scores as one clip at a time."""
+
+    def test_batched_scores_match_clip_by_clip(self):
+        import tempfile
+
+        import soundfile as sf
+        import torch
+
+        from src.evaluate import _score_clip, score
+        from src.model import build_model
+
+        torch.manual_seed(0)
+        tiny = {"name": "tiny", "freeze_feature_encoder": True, "freeze_transformer_layers": 0,
+                "dropout": 0.1}
+        rng = np.random.default_rng(0)
+        # 1 s to 13 s: one window, padded windows, a tail window, a separate middle window
+        seconds = [1.0, 2.5, 4.0, 5.3, 7.9, 13.1, 3.2, 9.0]
+        for pooling in ("mean", "attentive"):
+            model = build_model({**tiny, "pooling": pooling}).eval()
+            with tempfile.TemporaryDirectory() as folder:
+                paths = []
+                for i, s in enumerate(seconds):
+                    sf.write(Path(folder) / f"{i}.wav", 0.1 * rng.standard_normal(int(SAMPLE_RATE * s)),
+                             SAMPLE_RATE, subtype="PCM_16")
+                    paths.append(f"{i}.wav")
+                rows = pd.DataFrame({"path": paths})
+                expected = [_score_clip(model, sf.read(Path(folder) / p, dtype="float32")[0], SAMPLE_RATE, "cpu")
+                            for p in paths]
+                for batch_size in (1, 3, 64):  # windows of one clip split over batches, and all in one
+                    got = score(model, rows, folder, {"sample_rate": SAMPLE_RATE, "crop_seconds": 4.0}, "cpu",
+                                batch_size=batch_size, workers=2)
+                    np.testing.assert_allclose(got[["p_fake", "p_fake_middle"]].to_numpy(), expected, atol=1e-5,
+                                               err_msg=f"{pooling}, batch {batch_size}")

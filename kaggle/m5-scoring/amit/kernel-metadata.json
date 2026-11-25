@@ -1,0 +1,19 @@
+{
+  "id": "amit1506/dsai-group3-m5-score-amit",
+  "title": "dsai-group3-m5-score-amit",
+  "code_file": "score_full.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "tarikasubhashhedaoo/dsai-group3-m4-data"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [
+    "amit1506/milestone-4-f-02",
+    "amit1506/milestone-4-baselines-a-01-and-a-02",
+    "tarikasubhashhedaoo/dsai-group3-m5-full-tests-en"
+  ]
+}

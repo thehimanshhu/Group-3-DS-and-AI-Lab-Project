@@ -1,0 +1,19 @@
+{
+  "id": "tarikasubhashhedaoo/dsai-group3-m5-score-tarika",
+  "title": "dsai-group3-m5-score-tarika",
+  "code_file": "score_full.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "tarikasubhashhedaoo/dsai-group3-m4-data"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [
+    "tarikasubhashhedaoo/dsai-group3-m4-default-runs",
+    "tarikasubhashhedaoo/dsai-group3-m4-crosslang-v2",
+    "tarikasubhashhedaoo/dsai-group3-m5-full-tests-en"
+  ]
+}
