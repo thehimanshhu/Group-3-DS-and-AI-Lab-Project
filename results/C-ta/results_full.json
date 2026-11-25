@@ -1,0 +1,26 @@
+{
+ "run_id": "C-ta",
+ "threshold": 0.0001,
+ "eer": {
+  "valid": 0.00278,
+  "test_indomain": 0.0,
+  "test_unseen_gen": 0.06204,
+  "test_phone": 0.0075
+ },
+ "auc": {
+  "valid": 0.99995,
+  "test_indomain": 1.0,
+  "test_unseen_gen": 0.94537,
+  "test_phone": 0.99967
+ },
+ "accuracy": {
+  "valid": 0.99722,
+  "test_indomain": 0.9995,
+  "test_unseen_gen": 0.76806,
+  "test_phone": 0.9875
+ },
+ "held_out_language": "ta",
+ "eer_held_out": 0.03635,
+ "git_commit": "92b89b2",
+ "clips": 10832
+}
