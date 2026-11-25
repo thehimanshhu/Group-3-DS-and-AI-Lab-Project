@@ -1,0 +1,18 @@
+{
+  "id": "viknegi/dsai-group3-m5-score-vikram",
+  "title": "dsai-group3-m5-score-vikram",
+  "code_file": "score_full.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "tarikasubhashhedaoo/dsai-group3-m4-data"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [
+    "viknegi/m4-training-notebook-3",
+    "tarikasubhashhedaoo/dsai-group3-m5-full-tests-en"
+  ]
+}

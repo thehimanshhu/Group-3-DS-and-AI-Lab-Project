@@ -114,7 +114,10 @@ def main():
         cfg = run_config(run_id)
         manifest = read_manifest(args.data[0], cfg["data"])
         if args.full:
-            rows = manifest[(manifest.split == "valid") | manifest.split.str.startswith("test_")]
+            test = manifest.split.str.startswith("test_")
+            if cfg["data"].get("exclude_language"):  # cross-language runs: only the held-out language's test clips
+                test &= manifest.language == cfg["data"]["exclude_language"]
+            rows = manifest[(manifest.split == "valid") | test]
         else:
             rows = manifest[(manifest.split == "valid") | manifest.m4_eval.astype(str).eq("True")]
         if args.limit:
