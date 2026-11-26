@@ -26,8 +26,8 @@ Claude (Anthropic), used as a coding assistant in the terminal.
 
 ## How the team checked the work
 
-- **Tests.** New code comes with unit tests, for example: padding a clip must not change its score; batched scoring must match clip-by-clip scoring within 1e-5; scoring a clip with its first second cut must match scoring the cut audio directly; the Holm correction must match hand-computed values.
-- **Comparison with earlier results.** The sped-up scorer was compared clip by clip with the Milestone-4 predictions before it was used; every checkpoint downloaded for the release was checked against stored scores.
-- **Checks on the data.** Leakage checks (speakers, duplicate clips, ASVspoof partitions) are part of the data notebooks and are all 0. The click was found by testing whether a model could tell real from fake from the first 20 ms alone.
-- **Numbers in the text.** The figures quoted in the reports were checked against the notebook outputs and result files.
-- **Review.** Design decisions, interpretations and the final text were reviewed and approved by the team; assistant output that was wrong was corrected or discarded.
+- New code comes with unit tests, for example: padding a clip must not change its score; batched scoring must match clip-by-clip scoring within 1e-5; scoring a clip with its first second cut must match scoring the cut audio directly; the Holm correction must match hand-computed values.
+- The sped-up scorer was compared clip by clip with the Milestone-4 predictions before it was used; every checkpoint downloaded for the release was checked against stored scores.
+- Leakage checks (speakers, duplicate clips, ASVspoof partitions) are part of the data notebooks and are all 0. The click was found by testing whether a model could tell real from fake from the first 20 ms alone.
+- The figures quoted in the reports were checked against the notebook outputs and result files.
+- Design decisions, interpretations and the final text were reviewed and approved by the team; assistant output that was wrong was corrected or discarded.

@@ -6,7 +6,7 @@
 
 ## 1. Overview
 
-This milestone evaluates the models trained in Milestone 4 on the **full** test sets, about 25 times more clips than the Milestone-4 sample, and analyses where and why they fail. No model was trained or changed; every number comes from scoring saved checkpoints.
+This milestone evaluates the models trained in Milestone 4 on the full test sets, about 25 times more clips than the Milestone-4 sample, and analyses where and why they fail. No model was trained or changed; every number comes from scoring saved checkpoints.
 
 | | Result |
 | --- | --- |
@@ -54,7 +54,7 @@ Each run's decision threshold is the EER point on `valid`, fixed before any test
 
 ### 2.2 Evaluation Data
 
-**Size and composition.** The five test sets were fixed in Milestone 4 and are used unchanged; Milestone 4 scored a seeded sample of each, this milestone scores all of them.
+**Size and composition.** The five test sets were fixed in Milestone 4 and are used unchanged. Milestone 4 scored a seeded sample of each; this milestone scores all of them.
 
 | Test set | What it measures | Real | Fake | Total |
 | --- | --- | ---: | ---: | ---: |
@@ -70,7 +70,7 @@ In-the-Wild and ASVspoof were built in full from their pinned public releases (3
 
 **Preprocessing at evaluation.** Every clip went through the same steps as the training data (`src/preprocess.py`): mono, 16 kHz, edge-silence trimming, cutting the first 30 ms and trimming again (the click fix from Milestone 4), dropping clips under 1 s, RMS normalisation to −20 dBFS, 16-bit WAV.
 
-**Scoring.** Each clip is cut into 4 s windows every 2 s (the last window aligned with the end), each window is scaled to zero mean and unit variance and padded with an attention mask if short, and **`p_fake` is the mean over the windows**. The middle window's score is kept as `p_fake_middle`.
+**Scoring.** Each clip is cut into 4 s windows every 2 s (the last window aligned with the end), each window is scaled to zero mean and unit variance and padded with an attention mask if short, and `p_fake` is the mean over the windows. The middle window's score is kept as `p_fake_middle`.
 
 ### 2.3 Evaluation Environment
 
@@ -135,9 +135,9 @@ EER (%) on the full test sets, with 95% bootstrap intervals:
 | A-02 | 0.849 / 0.882 / 0.769 | 0.938 / 0.860 / 0.968 | 0.76 / 0.75 / 0.71 |
 | A-01 | 0.790 / 0.131 / 0.783 | 0.924 / 0.301 / 0.973 | 0.71 / 0.28 / 0.74 |
 
-- **XLS-R is far ahead of both baselines** on every hard test set, by 12–77 points of EER. In-domain, where all models see known generators, the gap is small.
-- **The ranking is better than the decisions.** F-01 ranks unseen-generator clips with AUC 0.97, but its F1 at the `valid` threshold is 0.50, lower than AASIST-L's 0.76. AASIST-L's threshold happens to sit in a better place; its ranking is much worse. Section 7.1 explains why.
-- **LFCC-LCNN is inverted on In-the-Wild** (AUC 0.13): it learnt features that point the wrong way on real-world recordings, the same failure Milestone 4 found on its sample.
+- XLS-R is far ahead of both baselines on every hard test set, by 12–77 points of EER. In-domain, where all models see known generators, the gap is small.
+- F-01 ranks unseen-generator clips with AUC 0.97, but its F1 at the `valid` threshold is 0.50, lower than AASIST-L's 0.76: AASIST-L ranks much worse, but its threshold happens to sit in a better place. Section 7.1 explains why.
+- LFCC-LCNN is inverted on In-the-Wild (AUC 0.13). It learnt features that point the wrong way on real-world recordings, the same failure Milestone 4 found on its sample.
 - The full-set EERs are within about one point of the Milestone-4 sample for every model (largest change: AASIST-L on ASVspoof, 27.7% → 30.1%), so the Milestone-4 conclusions hold.
 
 ### 4.2 Across Configurations
@@ -178,7 +178,7 @@ Tuning clearly helps only on the phone channel, the condition the phone-channel 
 | Tamil (C-ta) | 3.64% | 4.72% |
 | Telugu (C-te) | 5.64% | 4.77% |
 
-A model that never heard a language is about as good on it as one that did, confirming the Milestone-4 result on the full sets.
+A model that never heard a language is about as good on it as one that did. Milestone 4 found the same on its sample.
 
 ### 4.3 Across Hyperparameter Settings
 
@@ -274,7 +274,7 @@ F-03 makes no in-domain false negatives and no unseen-generator false positives.
 | C05 | In-the-Wild | fake → real | 0.00002 | Echo and reverberation, like a real voice in an empty room |
 | C06 | ASVspoof (A10) | fake → real | 0.00004 | Unnatural pronunciation and flat delivery, clearly generated to a listener |
 
-The failures are confident, not borderline: real clips scored near 1 and fakes near 0. The saliency peaks fall anywhere from 0.4 s to 2.0 s, and the share of gradient in the first second ranges from 15% to 65%, so the six maps show no common location. The listening notes are one listener's observations with the labels visible; they suggest audible cues (synthetic-sounding segments, robotic prosody, room reverberation, flat TTS delivery) but do not establish what the model reacts to. The audio stays private (Section 2.3).
+All six are confident mistakes, with real clips scored near 1 and fakes near 0. The saliency peaks fall anywhere from 0.4 s to 2.0 s, and the share of gradient in the first second ranges from 15% to 65%, so the six maps show no common location. The listening notes are one listener's observations with the labels visible; they suggest audible cues (synthetic-sounding segments, robotic prosody, room reverberation, flat TTS delivery) but do not establish what the model reacts to. The audio stays private (Section 2.3).
 
 ---
 
@@ -282,7 +282,7 @@ The failures are confident, not borderline: real clips scored near 1 and fakes n
 
 ### 7.1 The Threshold Does Not Transfer
 
-At the `valid` threshold almost every error on the hard sets is a **missed fake**; false alarms stay at or below 1%:
+At the `valid` threshold almost every error on the hard sets is a missed fake; false alarms stay at or below 1%:
 
 | F-01 | Missed fakes | Real clips flagged | `valid` threshold | Threshold giving the test EER |
 | --- | ---: | ---: | ---: | ---: |
@@ -303,7 +303,7 @@ At the `valid` threshold almost every error on the hard sets is a **missed fake*
 | D-01 at 5% false alarms | 8.0 | 13.7 | 12.5 |
 | A-02 at 5% false alarms | 53.0 | 36.5 | 58.1 |
 
-So the main failure is the **placement of the threshold**, not the ranking.
+The models rank new fakes well; the errors come from where the `valid` threshold sits.
 
 ### 7.2 Calibration
 
@@ -316,7 +316,7 @@ So the main failure is the **placement of the threshold**, not the ranking.
 | In-the-Wild | 6.3 | 7.3 | **4.0** | 90.6% → 93.8% |
 | In-domain, phone | 0.0–0.1 | 0.0–0.1 | 0.0–0.1 | unchanged |
 
-Temperature scaling on `valid` (in `src/calibrate.py`) gives the same answer: `valid` is separated almost perfectly, so the fitted temperature for F-01 and F-03 hits the lower search limit (0.05) and sharpens the scores further, leaving ECE on unseen generators unchanged (37.8 → 37.6). **Recalibration on known generators cannot fix scores on unknown ones; a small labelled sample from the target data can.** Both mappings are monotone, so neither changes the EER or AUC.
+Temperature scaling on `valid` (in `src/calibrate.py`) gives the same answer: `valid` is separated almost perfectly, so the fitted temperature for F-01 and F-03 hits the lower search limit (0.05) and sharpens the scores further, leaving ECE on unseen generators unchanged (37.8 → 37.6). Recalibrating on known generators leaves the scores on unknown ones as they are, while 10% labelled target data corrects most of them. Both mappings are monotone, so neither changes the EER or AUC.
 
 <div align="center">
   <img src="../../assets/infographics/Milestone-5/reliability.png" alt="Figure 7: F-01 reliability diagrams per test set, raw and after Platt scaling on 10% of the target test set." width="800">
@@ -334,7 +334,7 @@ Temperature scaling on `valid` (in `src/calibrate.py`) gives the same answer: `v
 | **IndicF5** | **15.60** | **15.90** | **12.11** | **13.43** | **34.42** |
 | MMS-TTS | 3.59 | 5.65 | 8.77 | 3.94 | 9.26 |
 
-IndicF5, a voice-cloning model that copies a reference speaker, is the hardest generator for every model and in every language (F-01: Hindi 17.2%, Tamil 16.0%, Telugu 10.4%). At the `valid` threshold all three final seeds miss most IndicF5 fakes. A second weak cell is **MMS-TTS in Telugu**: F-03 misses 718 of 720 at its threshold, and F-01 catches only 6.7% of them although its EER there is 5.0%, another case of a good ranking with a badly placed threshold. In-domain, the language makes no difference (EER below 0.2% for all three).
+IndicF5, a voice-cloning model that copies a reference speaker, is the hardest generator for every model and in every language (F-01: Hindi 17.2%, Tamil 16.0%, Telugu 10.4%). At the `valid` threshold all three final seeds miss most IndicF5 fakes. A second weak cell is **MMS-TTS in Telugu**: F-03 misses 718 of 720 at its threshold, and F-01 catches only 6.7% of them although its EER there is 5.0%: the ranking is fine there, the threshold is not. In-domain, the language makes no difference (EER below 0.2% for all three).
 
 **ASVspoof attacks.** EER of each attack against all bona fide clips:
 
@@ -343,7 +343,7 @@ IndicF5, a voice-cloning model that copies a reference speaker, is the hardest g
 | F-01 | 2.45 | 0.26 | 0.03 | **19.67** | **12.51** | 5.61 | 1.40 | 0.42 | 1.97 | 0.49 | 0.52 | 0.96 | 0.30 |
 | D-01 | 4.79 | 1.31 | 0.30 | **38.83** | **21.11** | 13.03 | 0.71 | 2.27 | 4.49 | 0.51 | 0.83 | 1.35 | 0.89 |
 
-A10 and A11 are the hardest attacks for every model; F-03 misses 97.5% of A10 fakes at its threshold. Both are Tacotron-style neural text-to-speech systems (A10 with a WaveRNN vocoder, A11 with Griffin-Lim), the closest of the 13 to modern TTS. A16 and A19 are the same systems as the training attacks A04 and A06, and are below 1% for every XLS-R model. The seed spread on ASVspoof (5.4–16.1%) is largest on A10, A11, A12, A07 and A15 (15–29 points between seeds) and below 1 point on A09, A16, A18 and A19.
+A10 and A11 are the hardest attacks for every model; F-03 misses 97.5% of A10 fakes at its threshold. Both are Tacotron-style neural text-to-speech systems (A10 with a WaveRNN vocoder, A11 with Griffin-Lim). A16 and A19 are the same systems as the training attacks A04 and A06, and are below 1% for every XLS-R model. The seed spread on ASVspoof (5.4–16.1%) is largest on A10, A11, A12, A07 and A15 (15–29 points between seeds) and below 1 point on A09, A16, A18 and A19.
 
 <div align="center">
   <img src="../../assets/infographics/Milestone-5/asvspoof_attacks.png" alt="Figure 8: EER per ASVspoof attack for the three final seeds and the default config." width="800">
@@ -351,9 +351,9 @@ A10 and A11 are the hardest attacks for every model; F-03 misses 97.5% of A10 fa
   <em>Figure 8: EER per ASVspoof attack for the three final seeds and the default config.</em>
 </div>
 
-**Clip duration.** Fewer windows means less evidence. On In-the-Wild, F-01's EER is 15.0% for clips of 1–2 s, 9.0% for 2–3 s and about 3% for 4–10 s; F-03 misses 69% of In-the-Wild fakes under 2 s against 46% at 4–8 s. ASVspoof shows the same direction, more weakly (7.5% under 2 s, 3.7–4.0% at 3–6 s). Duration bins also mix recording conditions and generators, so this is a pattern, not a proven cause.
+**Clip duration.** A short clip gives the model fewer windows to average. On In-the-Wild, F-01's EER is 15.0% for clips of 1–2 s, 9.0% for 2–3 s and about 3% for 4–10 s; F-03 misses 69% of In-the-Wild fakes under 2 s against 46% at 4–8 s. ASVspoof shows the same direction, more weakly (7.5% under 2 s, 3.7–4.0% at 3–6 s). Duration bins also mix recording conditions and generators, so they show where the errors are without proving that length causes them.
 
-**In-the-Wild speakers.** Among the 31 speakers with at least 50 real and 50 fake clips, F-01's EER has a median of 3.6% and ranges from 0.0% to 18.0%. The worst speakers are mostly heard in older archival recordings (historical speeches, broadcast audio), where the real clips are noisy and band-limited and their fakes are imitations of that sound; for one speaker group F-03 misses 125 of 126 fakes. Speaker and recording condition cannot be separated in this data.
+**In-the-Wild speakers.** Among the 31 speakers with at least 50 real and 50 fake clips, F-01's EER has a median of 3.6% and ranges from 0.0% to 18.0%. The worst speakers are mostly heard in older archival recordings (historical speeches, broadcast audio), where the real clips are noisy and band-limited. For one speaker group F-03 misses 125 of 126 fakes. Speaker and recording condition cannot be separated in this data.
 
 **Quiet frames.** For every test clip, the 10th percentile of 20 ms frame power relative to the clip's mean was measured as a proxy for pauses and background level. Missed fakes did not follow one direction across test sets (fewest misses in the quietest band on ASVspoof, a peak in the second band on In-the-Wild, flat on unseen generators), so this proxy does not explain the errors.
 
@@ -370,7 +370,7 @@ Milestone 4's explanation view showed F-01 reacting to the first second of a rea
 | In-the-Wild | 4.90% | 6.41% | +0.007 | −0.017 | 4.5% |
 | ASVspoof eval | 5.01% | 7.32% | +0.001 | −0.041 | 4.0% |
 
-If the model relied on the start of real recordings, cutting it would push real clips towards "fake". Real-clip scores barely move for any seed (mean change at most 0.007), and on the Indian-language sets almost no decision changes (at most 0.2%). Where the EER rises, it is on the short English clips, where one second is a large share of the speech; for F-01 and F-02 the rise comes mainly from fake clips losing evidence. The same check on the full sets with F-03, cutting every clip including those of 1–2 s, gives the same picture with larger rises on the short English sets (In-the-Wild 9.4% → 16.0%, ASVspoof 8.4% → 15.5%) and no significant change on the other three. **No onset shortcut remains.**
+No onset shortcut remains. If the model relied on the start of real recordings, cutting it would push real clips towards "fake", but real-clip scores barely move for any seed (mean change at most 0.007), and on the Indian-language sets almost no decision changes (at most 0.2%). Where the EER rises, it is on the short English clips, where one second is a large share of the speech; for F-01 and F-02 the rise comes mainly from fake clips losing evidence. The same check on the full sets with F-03, cutting every clip including those of 1–2 s, gives the same picture with larger rises on the short English sets (In-the-Wild 9.4% → 16.0%, ASVspoof 8.4% → 15.5%) and no significant change on the other three.
 
 ### 7.5 Where the Model Is Good and Where It Is Poor
 
@@ -388,10 +388,10 @@ If the model relied on the start of real recordings, cutting it would push real 
 
 ### 8.1 Key Observations
 
-1. **The model ranks well but decides badly on new sources.** The gap between EER and accuracy at the `valid` threshold is the main result of this milestone. It comes from a validation set that holds only known generators.
-2. **A small labelled sample from the target data fixes most of the decision problem.** 10% of a test set is enough to recalibrate scores and threshold (accuracy 50% → 93% on unseen generators); `valid` is not.
-3. **The training seed matters more than most tuning decisions.** The final config is not reliably better than the default outside the phone channel.
-4. **The data is now free of the shortcuts we know of.** Both checks on the start of the clip (the click in Milestone 4, the onset check here) are clean.
+1. The model ranks well but decides badly on new sources. The gap between EER and accuracy at the `valid` threshold is the main result of this milestone. It comes from a validation set that holds only known generators.
+2. A small labelled sample from the target data fixes most of the decision problem: 10% of a test set is enough to recalibrate scores and threshold (accuracy 50% → 93% on unseen generators), and `valid` is no substitute.
+3. The training seed matters more than most tuning decisions. The final config is not reliably better than the default outside the phone channel.
+4. The data is free of the shortcuts we know of: both checks on the start of the clip (the click in Milestone 4, the onset check here) are clean.
 
 ### 8.2 Expected vs Actual Performance
 

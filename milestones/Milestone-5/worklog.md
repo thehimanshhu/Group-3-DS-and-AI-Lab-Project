@@ -12,11 +12,11 @@ This document tracks the work completed and responsibilities assigned for Milest
 
 - Planned Milestone 5 and divided the work among the team.
 - Built the full test sets: the Indian-language sets locally and the full In-the-Wild and ASVspoof sets on Kaggle (118,295 test clips), merged the manifest, ran the leakage checks and uploaded the data (`01_full_test_sets.ipynb`).
-- Extended `src/score.py` to score the full test sets from several data folders, and sped up scoring about 6.5 times (windows from many clips in one batch, fp16 on both GPUs, audio read by worker processes), checked clip by clip against the Milestone-4 predictions.
+- Extended `src/score.py` to score the full test sets from several data folders. Sped up scoring about 6.5 times (windows from many clips in one batch, fp16 on both GPUs, audio read by worker processes) and checked the new scores clip by clip against the Milestone-4 predictions.
 - Wrote the full-scoring scripts for every model and scored F-01 on the full test sets.
 - Released the final, default and baseline weights with the data manifest on the Hugging Face Hub, with a model card.
 - Wrote the error analysis, operating-point and calibration notebook and the onset check on all three final seeds (`02_errors_and_calibration.ipynb`, with the `--trim-start` scoring option).
-- Reviewed and merged the team's pull requests, wrote the Milestone-5 report and the AI usage disclosure.
+- Reviewed and merged the team's pull requests, and wrote the Milestone-5 report and the AI usage disclosure.
 
 ---
 
