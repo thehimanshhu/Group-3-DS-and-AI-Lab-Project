@@ -1,6 +1,12 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score,
+    auc,
+    confusion_matrix,
+    precision_recall_curve,
+    roc_auc_score,
+)
 
 from src.metrics import eer
 
@@ -16,6 +22,7 @@ def evaluate_splits(predictions: pd.DataFrame) -> pd.DataFrame:
         scores = group["p_fake"]
         predicted_fake = scores.ge(threshold)
         split_eer, _ = eer(is_fake, scores)
+        precision_curve, recall_curve, _ = precision_recall_curve(is_fake, scores)
         tn, fp, fn, tp = confusion_matrix(
             is_fake, predicted_fake, labels=[False, True]
         ).ravel()
@@ -25,7 +32,11 @@ def evaluate_splits(predictions: pd.DataFrame) -> pd.DataFrame:
             "clips": len(group),
             "eer_pct": 100 * split_eer,
             "roc_auc": roc_auc_score(is_fake, scores),
+            "pr_auc": auc(recall_curve, precision_curve),
             "accuracy": accuracy_score(is_fake, predicted_fake),
+            "precision": tp / (tp + fp) if tp + fp else 0.0,
+            "recall": tp / (tp + fn) if tp + fn else 0.0,
+            "f1": 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else 0.0,
             "real_as_real": tn,
             "real_as_fake": fp,
             "fake_as_real": fn,
