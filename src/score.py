@@ -99,6 +99,9 @@ def main():
     parser.add_argument("--limit", type=int, default=0, help="score at most this many real and this many fake clips per split (quick tests)")
     parser.add_argument("--batch-size", type=int, default=64, help="audio windows per forward pass (split over all GPUs)")
     parser.add_argument("--fp32", action="store_true", help="score in fp32 (about 2.5x slower; fp16 moves only borderline scores)")
+    parser.add_argument("--trim-start", type=float, default=0,
+                        help="cut this many seconds from the start of each clip (onset check; clips that would keep "
+                             "less than 1 s are scored whole); writes predictions_trim<N>s.csv / results_trim<N>s.json")
     parser.add_argument("--full", action="store_true",
                         help="score every test clip (Milestone 5), not just the Milestone-4 sample; writes "
                              "predictions_full.csv.gz and results_full.json")
@@ -125,11 +128,11 @@ def main():
         rows = resolve_paths(rows.reset_index(drop=True), args.data)
         model = load_model(find_checkpoint(run_id, args.checkpoints), cfg, device)
         predictions = score(model, rows, "/", cfg["data"], device, batch_size=args.batch_size,
-                            fp16=not args.fp32)[COLUMNS]
+                            fp16=not args.fp32, trim_start=args.trim_start)[COLUMNS]
         predictions[["p_fake", "p_fake_middle"]] = predictions[["p_fake", "p_fake_middle"]].round(5)
         folder = Path(args.out) / run_id
         folder.mkdir(parents=True, exist_ok=True)
-        suffix = "_full" if args.full else ""
+        suffix = ("_full" if args.full else "") + (f"_trim{args.trim_start:g}s" if args.trim_start else "")
         predictions.to_csv(folder / f"predictions{suffix}.csv{'.gz' if args.full else ''}", index=False)
         results = summarise(run_id, predictions, cfg) | {"git_commit": commit, "clips": len(predictions)}
         (folder / f"results{suffix}.json").write_text(json.dumps(results, indent=1))

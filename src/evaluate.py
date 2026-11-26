@@ -224,8 +224,9 @@ def _clip_windows(audio: np.ndarray, window_size: int, hop_size: int):
 class _ClipWindows:
     """Dataset of clips -> their windows, for a DataLoader whose worker processes read and cut the clips."""
 
-    def __init__(self, paths, sample_rate, window_size, hop_size):
+    def __init__(self, paths, sample_rate, window_size, hop_size, trim_start=0):
         self.paths, self.sample_rate, self.window_size, self.hop_size = paths, sample_rate, window_size, hop_size
+        self.trim_start = trim_start  # samples cut from the start (onset check); skipped if less than 1 s would remain
 
     def __len__(self):
         return len(self.paths)
@@ -236,12 +237,15 @@ class _ClipWindows:
         audio, actual_rate = sf.read(self.paths[index], dtype="float32")
         if actual_rate != self.sample_rate or audio.ndim != 1:
             raise ValueError(f"Expected mono audio at {self.sample_rate} Hz: {self.paths[index]}")
+        if self.trim_start and len(audio) - self.trim_start >= self.sample_rate:
+            audio = audio[self.trim_start:]
         waves, masks, num_sliding, middle = _clip_windows(audio, self.window_size, self.hop_size)
         return np.stack(waves), np.stack(masks), num_sliding, middle
 
 
 def score(model, rows: pd.DataFrame, data_dir, data_cfg: dict, device,
-          batch_size: int = 64, fp16: bool = True, workers: int = 4, log_every: float = 120) -> pd.DataFrame:
+          batch_size: int = 64, fp16: bool = True, workers: int = 4, log_every: float = 120,
+          trim_start: float = 0) -> pd.DataFrame:
     """Score each processed WAV listed in the manifest.
 
     p_fake is the mean fake probability over 4 s windows every 2 s, p_fake_middle the middle
@@ -249,7 +253,8 @@ def score(model, rows: pd.DataFrame, data_dir, data_cfg: dict, device,
     fp16 on a GPU, on every visible GPU, while worker processes read the next clips (processes,
     not threads, so reading never holds up the thread that feeds the GPU). The scores match
     scoring clip by clip in fp32 (_score_clip) up to fp16 rounding. Prints progress every
-    log_every seconds, with the time spent waiting for audio and in the model.
+    log_every seconds, with the time spent waiting for audio and in the model. trim_start (seconds)
+    cuts the start of every clip that is at least 1 s longer than that (the onset check).
     """
     import time
     from pathlib import Path
@@ -279,7 +284,8 @@ def score(model, rows: pd.DataFrame, data_dir, data_cfg: dict, device,
 
     paths = [str(Path(data_dir) / p) for p in rows["path"]]
     clips = torch.utils.data.DataLoader(
-        _ClipWindows(paths, sample_rate, window_size, 2 * sample_rate), batch_size=None,
+        _ClipWindows(paths, sample_rate, window_size, 2 * sample_rate, round(trim_start * sample_rate)),
+        batch_size=None,
         num_workers=workers, prefetch_factor=32 if workers else None, persistent_workers=False)
 
     probs = []  # fake probability of every window, in order

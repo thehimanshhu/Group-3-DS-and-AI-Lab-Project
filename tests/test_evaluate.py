@@ -175,3 +175,30 @@ class BatchedScoringTests(unittest.TestCase):
                                 batch_size=batch_size, workers=2)
                     np.testing.assert_allclose(got[["p_fake", "p_fake_middle"]].to_numpy(), expected, atol=1e-5,
                                                err_msg=f"{pooling}, batch {batch_size}")
+
+
+class TrimStartTests(unittest.TestCase):
+    def test_trim_start_scores_the_clip_without_its_first_second(self):
+        import tempfile
+
+        import soundfile as sf
+        import torch
+
+        from src.evaluate import _score_clip, score
+        from src.model import build_model
+
+        torch.manual_seed(0)
+        model = build_model({"name": "tiny", "freeze_feature_encoder": True, "freeze_transformer_layers": 0,
+                             "dropout": 0.1, "pooling": "mean"}).eval()
+        rng = np.random.default_rng(1)
+        clips = {"long.wav": 0.1 * rng.standard_normal(SAMPLE_RATE * 5),     # trimmed to 4 s
+                 "short.wav": 0.1 * rng.standard_normal(SAMPLE_RATE * 3 // 2)}  # 1.5 s: scored whole
+        with tempfile.TemporaryDirectory() as folder:
+            for name, audio in clips.items():
+                sf.write(Path(folder) / name, audio, SAMPLE_RATE, subtype="FLOAT")
+            got = score(model, pd.DataFrame({"path": list(clips)}), folder,
+                        {"sample_rate": SAMPLE_RATE, "crop_seconds": 4.0}, "cpu", workers=0, trim_start=1.0)
+        audio = {k: v.astype(np.float32) for k, v in clips.items()}
+        expected = [_score_clip(model, audio["long.wav"][SAMPLE_RATE:], SAMPLE_RATE, "cpu"),
+                    _score_clip(model, audio["short.wav"], SAMPLE_RATE, "cpu")]
+        np.testing.assert_allclose(got[["p_fake", "p_fake_middle"]].to_numpy(), expected, atol=1e-5)
