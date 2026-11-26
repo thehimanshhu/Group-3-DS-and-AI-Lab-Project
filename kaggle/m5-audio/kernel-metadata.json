@@ -1,0 +1,19 @@
+{
+  "id": "viknegi/dsai-group3-m5-audio-vikram",
+  "title": "dsai-group3-m5-audio-vikram",
+  "code_file": "review.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "tarikasubhashhedaoo/dsai-group3-m4-data"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [
+    "viknegi/m4-training-notebook-3",
+    "tarikasubhashhedaoo/dsai-group3-m5-full-tests-en",
+    "viknegi/dsai-group3-m5-score-vikram"
+  ]
+}
