@@ -1,0 +1,30 @@
+{
+ "run_id": "V-04",
+ "threshold": 0.00135,
+ "eer": {
+  "valid": 0.00835,
+  "test_indomain": 0.002,
+  "test_unseen_gen": 0.12,
+  "test_phone": 0.026,
+  "test_itw": 0.1963,
+  "test_asvspoof": 0.15701
+ },
+ "auc": {
+  "valid": 0.99918,
+  "test_indomain": 1.0,
+  "test_unseen_gen": 0.93462,
+  "test_phone": 0.99628,
+  "test_itw": 0.88278,
+  "test_asvspoof": 0.91405
+ },
+ "accuracy": {
+  "valid": 0.99165,
+  "test_indomain": 0.997,
+  "test_unseen_gen": 0.699,
+  "test_phone": 0.866,
+  "test_itw": 0.81529,
+  "test_asvspoof": 0.8862
+ },
+ "git_commit": "a65788d",
+ "clips": 8843
+}
