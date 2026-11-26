@@ -1,0 +1,26 @@
+{
+ "run_id": "C-hi",
+ "threshold": 0.28143,
+ "eer": {
+  "valid": 0.00278,
+  "test_indomain": 0.002,
+  "test_unseen_gen": 0.06574,
+  "test_phone": 0.0205
+ },
+ "auc": {
+  "valid": 0.99998,
+  "test_indomain": 1.0,
+  "test_unseen_gen": 0.9751,
+  "test_phone": 0.99872
+ },
+ "accuracy": {
+  "valid": 0.99722,
+  "test_indomain": 0.9975,
+  "test_unseen_gen": 0.63611,
+  "test_phone": 0.8765
+ },
+ "held_out_language": "hi",
+ "eer_held_out": 0.03597,
+ "git_commit": "92b89b2",
+ "clips": 10832
+}

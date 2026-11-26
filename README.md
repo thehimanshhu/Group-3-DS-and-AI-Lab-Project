@@ -21,6 +21,7 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 ├── README.md
 ├── LICENSE                  # MIT licence
 ├── acknowledgement.md       # Signed acknowledgement of contributions
+├── AI-usage-disclosure.md   # How an AI assistant was used and how its work was checked
 ├── assets/
 │   ├── infographics/        # Figures used in the milestone reports
 │   └── signatures/          # Member signatures (<roll no>.jpg)
@@ -36,16 +37,22 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 │   │   ├── Milestone-3.md   # Model architecture & end-to-end pipeline check
 │   │   ├── worklog.md
 │   │   └── Milestone-3-presentation.pdf
-│   └── Milestone-4/
-│       ├── Milestone-4.md   # Model training, hyperparameter experiments & regularization
+│   ├── Milestone-4/
+│   │   ├── Milestone-4.md   # Model training, hyperparameter experiments & regularization
+│   │   ├── worklog.md
+│   │   └── Milestone-4-presentation.pdf
+│   └── Milestone-5/
+│       ├── Milestone-5.md   # Evaluation & analysis of results
 │       ├── worklog.md
-│       └── Milestone-4-presentation.pdf
+│       └── Milestone-5-presentation.pdf
 ├── notebooks/
 │   ├── Milestone-2/         # EDA notebooks, generation pipeline
 │   ├── Milestone-3/         # Data preparation and pipeline-check notebooks, run outputs
-│   └── Milestone-4/         # Data, training and final evaluation notebooks
+│   ├── Milestone-4/         # Data, training and final evaluation notebooks
+│   └── Milestone-5/         # Full test sets, error analysis, calibration, sweep reliability
 ├── src/                     # Preprocessing, data loading, models, training, augmentation, evaluation, scoring
 ├── configs/                 # One YAML config per training run
+├── kaggle/                  # Kaggle scripts for full-set scoring and the onset check
 ├── results/                 # Logs, predictions and metrics of every run (one folder per run)
 ├── tests/                   # Unit tests
 ├── data/README.md           # Layout of the (uncommitted) data folder and how to get it
@@ -61,8 +68,27 @@ AI tools can now copy a voice from a few seconds of audio, and cloned voices are
 | 2 | [Dataset preparation](milestones/Milestone-2/Milestone-2.md) | 29 Oct | Done |
 | 3 | [Model architecture](milestones/Milestone-3/Milestone-3.md) | 5 Nov | Done |
 | 4 | [Model training](milestones/Milestone-4/Milestone-4.md) | 19 Nov | Done |
-| 5 | Evaluation & analysis | 26 Nov | Planned |
+| 5 | [Evaluation & analysis](milestones/Milestone-5/Milestone-5.md) | 26 Nov | Done |
 | 6 | Deployment & documentation | 10 Dec | Planned |
+
+## Milestone 5: Evaluation and Analysis
+
+- **Report:** [Milestone-5.md](milestones/Milestone-5/Milestone-5.md) · [Presentation](milestones/Milestone-5/Milestone-5-presentation.pdf) · [Worklog](milestones/Milestone-5/worklog.md) · [AI usage disclosure](AI-usage-disclosure.md)
+- **Model weights and data manifest:** [Hugging Face Hub](https://huggingface.co/TarikaHedaoo/indic-deepfake-voice-detection) (final, default and baseline models; CC-BY-NC-4.0)
+- **Notebooks** (saved with their outputs):
+  - [`01_full_test_sets.ipynb`](notebooks/Milestone-5/01_full_test_sets.ipynb): the full test sets (118,295 clips), merged manifest and leakage checks
+  - [`02_errors_and_calibration.ipynb`](notebooks/Milestone-5/02_errors_and_calibration.ipynb): metrics at the validation threshold, ROC/DET curves, operating points, errors by generator, attack, language, duration and speaker, calibration, onset check
+  - [`03_configurations_and_sweeps.ipynb`](notebooks/Milestone-5/03_configurations_and_sweeps.ipynb): Holm correction of the sweep comparisons, seed spread, default vs final config, sweep checkpoints on test
+  - [`error_analysis.ipynb`](notebooks/Milestone-5/error_analysis.ipynb): qualitative results, threshold transfer, quiet-frame analysis, full-set onset check
+- **Results:** per-clip scores on the full test sets in `results/<run>/predictions_full.csv.gz` and metrics in `results_full.json`; summary tables in `results/milestone5_*.csv`.
+
+**To reproduce the evaluation:**
+
+1. `pip install -r requirements.txt`
+2. Get the weights from the Hugging Face release, and the audio by rebuilding it with the data notebooks of Milestones 4 and 5 (or ask for access to the Kaggle dataset `dsai-group3-m4-data`, version 4).
+3. Score: `python -m src.score F-01 --full --data <data folder> [<folder with the full English sets>] --checkpoints <folder with F-01/best.pt> --out <output folder>` (about 46 min on 2 × T4), or push a script from [`kaggle/m5-scoring/`](kaggle/m5-scoring/).
+4. Run the Milestone-5 notebooks on the saved predictions (CPU only).
+5. Tests: `python -m unittest discover -s tests -p 'test_*.py'`
 
 ## Milestone 4: Model Training
 

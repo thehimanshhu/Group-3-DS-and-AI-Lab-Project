@@ -1,6 +1,12 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score,
+    auc,
+    confusion_matrix,
+    precision_recall_curve,
+    roc_auc_score,
+)
 
 from src.metrics import eer
 
@@ -16,6 +22,7 @@ def evaluate_splits(predictions: pd.DataFrame) -> pd.DataFrame:
         scores = group["p_fake"]
         predicted_fake = scores.ge(threshold)
         split_eer, _ = eer(is_fake, scores)
+        precision_curve, recall_curve, _ = precision_recall_curve(is_fake, scores)
         tn, fp, fn, tp = confusion_matrix(
             is_fake, predicted_fake, labels=[False, True]
         ).ravel()
@@ -25,7 +32,11 @@ def evaluate_splits(predictions: pd.DataFrame) -> pd.DataFrame:
             "clips": len(group),
             "eer_pct": 100 * split_eer,
             "roc_auc": roc_auc_score(is_fake, scores),
+            "pr_auc": auc(recall_curve, precision_curve),
             "accuracy": accuracy_score(is_fake, predicted_fake),
+            "precision": tp / (tp + fp) if tp + fp else 0.0,
+            "recall": tp / (tp + fn) if tp + fn else 0.0,
+            "f1": 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else 0.0,
             "real_as_real": tn,
             "real_as_fake": fp,
             "fake_as_real": fn,
@@ -210,31 +221,123 @@ def _score_clip(model, audio: np.ndarray, sample_rate: int, device, crop_seconds
     )
 
 
-def score(model, rows: pd.DataFrame, data_dir, data_cfg: dict, device) -> pd.DataFrame:
-    """Score each processed WAV listed in the manifest."""
+def _clip_windows(audio: np.ndarray, window_size: int, hop_size: int):
+    """The sliding windows of one clip plus its middle window: (waves, masks, sliding count, middle index)."""
+    starts = _window_starts(len(audio), window_size, hop_size)
+    num_sliding_windows = len(starts)
+    middle_start = max(0, (len(audio) - window_size) // 2)
+    if middle_start not in starts:
+        starts.append(middle_start)
+    waves, masks = zip(*(_prepare_window(audio, start, window_size) for start in starts))
+    return waves, masks, num_sliding_windows, starts.index(middle_start)
+
+
+class _ClipWindows:
+    """Dataset of clips -> their windows, for a DataLoader whose worker processes read and cut the clips."""
+
+    def __init__(self, paths, sample_rate, window_size, hop_size, trim_start=0):
+        self.paths, self.sample_rate, self.window_size, self.hop_size = paths, sample_rate, window_size, hop_size
+        self.trim_start = trim_start  # samples cut from the start (onset check); skipped if less than 1 s would remain
+
+    def __len__(self):
+        return len(self.paths)
+
+    def __getitem__(self, index):
+        import soundfile as sf
+
+        audio, actual_rate = sf.read(self.paths[index], dtype="float32")
+        if actual_rate != self.sample_rate or audio.ndim != 1:
+            raise ValueError(f"Expected mono audio at {self.sample_rate} Hz: {self.paths[index]}")
+        if self.trim_start and len(audio) - self.trim_start >= self.sample_rate:
+            audio = audio[self.trim_start:]
+        waves, masks, num_sliding, middle = _clip_windows(audio, self.window_size, self.hop_size)
+        return np.stack(waves), np.stack(masks), num_sliding, middle
+
+
+def score(model, rows: pd.DataFrame, data_dir, data_cfg: dict, device,
+          batch_size: int = 64, fp16: bool = True, workers: int = 4, log_every: float = 120,
+          trim_start: float = 0) -> pd.DataFrame:
+    """Score each processed WAV listed in the manifest.
+
+    p_fake is the mean fake probability over 4 s windows every 2 s, p_fake_middle the middle
+    window's. Windows from many clips go through the model together (batch_size windows), in
+    fp16 on a GPU, on every visible GPU, while worker processes read the next clips (processes,
+    not threads, so reading never holds up the thread that feeds the GPU). The scores match
+    scoring clip by clip in fp32 (_score_clip) up to fp16 rounding. Prints progress every
+    log_every seconds, with the time spent waiting for audio and in the model. trim_start (seconds)
+    cuts the start of every clip that is at least 1 s longer than that (the onset check).
+    """
+    import time
     from pathlib import Path
 
-    import soundfile as sf
+    import torch
 
-    data_dir = Path(data_dir)
     sample_rate = data_cfg.get("sample_rate", 16_000)
-    crop_seconds = data_cfg.get("crop_seconds", 4.0)
+    window_size = round(data_cfg.get("crop_seconds", 4.0) * sample_rate)
+    device = torch.device(device)
     model.eval()
+    net = model
+    if device.type == "cuda" and fp16:
+        class Half(torch.nn.Module):
+            """fp16 autocast inside forward, so it also holds in DataParallel's worker threads."""
 
-    window_scores = []
-    middle_scores = []
+            def __init__(self, inner):
+                super().__init__()
+                self.inner = inner
 
-    for relative_path in rows["path"]:
-        path = data_dir / relative_path
-        audio, actual_rate = sf.read(path, dtype="float32")
+            def forward(self, wave, mask):
+                with torch.autocast("cuda", dtype=torch.float16):
+                    return self.inner(wave, mask).float()
 
-        if actual_rate != sample_rate or audio.ndim != 1:
-            raise ValueError(f"Expected mono audio at {sample_rate} Hz: {path}")
+        net = Half(net)
+    if device.type == "cuda" and torch.cuda.device_count() > 1:
+        net = torch.nn.DataParallel(net)
 
-        window_score, middle_score = _score_clip(
-            model, audio, sample_rate, device, crop_seconds
-        )
-        window_scores.append(window_score)
-        middle_scores.append(middle_score)
+    paths = [str(Path(data_dir) / p) for p in rows["path"]]
+    clips = torch.utils.data.DataLoader(
+        _ClipWindows(paths, sample_rate, window_size, 2 * sample_rate, round(trim_start * sample_rate)),
+        batch_size=None,
+        num_workers=workers, prefetch_factor=32 if workers else None, persistent_workers=False)
 
+    probs = []  # fake probability of every window, in order
+    layout = []  # per clip: (first window, sliding windows, middle index)
+    waves, masks = [], []
+    pending = 0  # windows waiting in waves / masks
+    total = 0
+    waited = in_model = 0.0
+    start = last_log = time.time()
+
+    def run_batch():
+        nonlocal waves, masks, pending, in_model
+        t = time.time()
+        wave, mask = np.concatenate(waves), np.concatenate(masks)
+        waves, masks = [wave[batch_size:]], [mask[batch_size:]]
+        pending = len(wave) - batch_size if len(wave) > batch_size else 0
+        with torch.inference_mode():
+            logits = net(torch.from_numpy(wave[:batch_size]).to(device), torch.from_numpy(mask[:batch_size]).to(device))
+            probs.append(logits.float().softmax(dim=1)[:, 1].cpu().numpy())
+        in_model += time.time() - t
+
+    t = time.time()
+    for clip_waves, clip_masks, num_sliding, middle in clips:
+        waited += time.time() - t
+        layout.append((total, int(num_sliding), int(middle)))
+        total += len(clip_waves)
+        waves.append(np.asarray(clip_waves))
+        masks.append(np.asarray(clip_masks))
+        pending += len(clip_waves)
+        while pending >= batch_size:
+            run_batch()
+        if log_every and time.time() - last_log > log_every:
+            last_log = time.time()
+            elapsed = last_log - start
+            print(f"  {len(layout):,}/{len(paths):,} clips, {len(layout) / elapsed:.1f} clips/s, "
+                  f"waiting for audio {waited:.0f} s, model {in_model:.0f} s", flush=True)
+        t = time.time()
+    while pending:
+        run_batch()
+
+    window_probs = np.concatenate(probs) if probs else np.zeros(0)
+    window_scores = [float(window_probs[first : first + n].mean()) for first, n, _ in layout]
+    middle_scores = [float(window_probs[first + middle]) for first, _, middle in layout]
     return rows.assign(p_fake=window_scores, p_fake_middle=middle_scores)
