@@ -6,7 +6,7 @@ This document states how an AI assistant was used in this project and how the te
 
 ## Tool
 
-Claude (Anthropic), used as a coding assistant in the terminal with access to the project repository.
+Claude (Anthropic), used as a coding assistant in the terminal.
 
 ## What it was used for
 
