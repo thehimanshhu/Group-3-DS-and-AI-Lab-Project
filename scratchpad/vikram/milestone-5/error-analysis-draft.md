@@ -14,7 +14,22 @@ The table pairs one seeded success per split with a mistake selected from the mo
 | In-the-Wild | Real, `0.00005` → real | Real, `0.99998` → fake |
 | ASVspoof | Fake, `0.99998` → fake | Fake, `0.00004` → real |
 
-The unseen-generator mistake was Hindi IndicF5; the ASVspoof mistake was attack A10. The in-domain false positive and the phone false positive in the table are versions of the same real utterance. F-03 had no in-domain false negatives and no unseen-generator false positives. Private listening and saliency on selected failures are still pending; the scores alone do not identify an audio cue.
+The unseen-generator mistake was Hindi IndicF5; the ASVspoof mistake was attack A10. The in-domain false positive and the phone false positive in the table are versions of the same real utterance. F-03 had no in-domain false negatives and no unseen-generator false positives.
+
+### Listening review of six failures
+
+One listener reviewed six mistakes in a private Kaggle page, in the order below. True labels and verdicts were visible. Saliency is the gradient of `p_fake` with respect to the input, averaged over scoring windows and smoothed over 20 ms (`src/explain.py`).
+
+| Case | Test set | True → verdict | `p_fake` | Saliency peak | Listener’s observation |
+| --- | --- | --- | ---: | ---: | --- |
+| C01 | In-the-Wild | real → fake | 0.99998 | 0.79 s | Around 0:01, the deep “r” between “Oh” and “really?” sounded generated. |
+| C02 | Phone channel | real → fake | 0.99988 | 0.42 s | Robotic, with similar intonation throughout; a pause after the first few words around 0:02. |
+| C03 | ASVspoof | real → fake | 0.99817 | 1.57 s | The voice sounded rushed; no sound was heard after about 0:02. |
+| C04 | Unseen generators (Hindi IndicF5) | fake → real | 0.00002 | 1.97 s | Sounded like a television news report and came across as a genuine story. |
+| C05 | In-the-Wild | fake → real | 0.00002 | 1.79 s | Echo and reverberation suggested a real voice recorded in an empty room. |
+| C06 | ASVspoof (A10) | fake → real | 0.00004 | 1.00 s | Unnatural pronunciation and flat delivery; the listener judged it generated after one listen. |
+
+This is one listener’s account, not a controlled perceptual test. The page showed the labels, so the notes are hypotheses about audible cues, not verified causes of the model’s errors. C04 concerns the content sounding like a genuine news story; the detector reads audio only and does not parse the transcript. Saliency peaks ranged from 0.42 s to 1.97 s, and the share of gradient in the first second ranged from 15% to 65%, so the six plots show no common location. Six cases are too few to generalize from.
 
 ## Error analysis
 
@@ -37,7 +52,19 @@ F-03 reached 44.0% accuracy on unseen generators despite a ROC AUC of 0.959. Its
 - **Clip duration.** F-03 missed 1,490 of 2,158 In-the-Wild fakes under two seconds (69.0%), versus 1,626 of 3,516 at four to under eight seconds (46.2%). It flagged 35 of 5,032 real clips in the short bin and 1 of 4,502 in the longer bin. F-01 and F-02 also missed a larger share of fakes in the short bin, but unseen-generator fakes did not show a consistent direction across runs. Duration bins can mix recording conditions and generators; they do not isolate the effect of length.
 - **In-the-Wild speaker groups.** In anonymized group S02, F-03 missed 125 of 126 fakes and flagged none of 80 real clips. For S52, it missed 3 of 64 fakes and flagged none of 32 real clips. F-01 and F-02 showed the same contrast in misses. Speaker groups can also differ in recording conditions and how their fakes were made.
 
-Still to add: loudness or noise measurements. Measurements from normalized audio are proxies for the processed signal, not estimates of original recording loudness.
+### Quiet-frame energy
+
+For every processed test clip, we measured the 10th percentile of 20 ms frame power relative to the clip’s mean frame power, in dB. Lower values mean the quiet frames are far below the rest of that clip. This is a proxy computed after preprocessing (which normalizes each clip to −20 dBFS): it describes pauses and signal dynamics, not original loudness or background noise, and the generator or recording conditions can confound it.
+
+| Test set | True label | < −30 dB | −30 to < −20 dB | −20 to < −10 dB | ≥ −10 dB |
+| --- | --- | ---: | ---: | ---: | ---: |
+| ASVspoof | fake (missed) | 10.8% (17,378) | 32.4% (29,094) | 34.4% (14,080) | 38.1% (113) |
+| In-the-Wild | fake (missed) | 48.5% (2,723) | 60.6% (6,086) | 49.6% (2,397) | 76.3% (38) |
+| Unseen generators | fake (missed) | 74.9% (4,146) | 71.6% (1,534) | 79.9% (773) | 76.9% (26) |
+| ASVspoof | real (flagged) | 0.10% (3,020) | 0.00% (2,825) | 0.00% (1,059) | 4.8% (21) |
+| In-the-Wild | real (flagged) | 0.04% (2,298) | 0.15% (11,683) | 0.38% (4,749) | 7.6% (92) |
+
+Parentheses give the number of clips in the cell; the last band has fewer than 120 clips in every row and should not be read as a stable rate. The other two splits had at most one error per cell. The relationship differs by test set: ASVspoof misses were lowest in the quietest band and rose with higher low-energy frames, In-the-Wild misses peaked in the second band, and unseen-generator misses were roughly flat. We therefore do not claim a single direction for the proxy.
 
 ### Sensitivity to removing the first second
 
@@ -52,3 +79,7 @@ We removed the first second of the processed audio and rescored it with the same
 | ASVspoof | 66,809 | 104 / 677 | 8.384% | 15.497% | +7.113 (6.727 to 7.470) |
 
 The trim increased EER most on In-the-Wild and ASVspoof. The other three intervals included zero. We excluded 980 clips because fewer than 400 samples (25 ms at 16 kHz) remained after the cut. That leaves 117,315 paired clips. The result shows sensitivity to this cut, but it does not identify an onset cue: the cut also shortens the clip and changes the placement of scoring windows.
+
+### Remaining handoff
+
+The private review page and saliency images stay in Kaggle. The compiled report needs these sections merged with the quantitative benchmark tables (Amit) and the configuration and seed analysis (Tarika).
