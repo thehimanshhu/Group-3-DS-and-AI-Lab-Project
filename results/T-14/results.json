@@ -1,0 +1,30 @@
+{
+ "run_id": "T-14",
+ "threshold": 0.04791,
+ "eer": {
+  "valid": 0.00557,
+  "test_indomain": 0.0,
+  "test_unseen_gen": 0.118,
+  "test_phone": 0.023,
+  "test_itw": 0.18259,
+  "test_asvspoof": 0.0706
+ },
+ "auc": {
+  "valid": 0.99969,
+  "test_indomain": 1.0,
+  "test_unseen_gen": 0.93205,
+  "test_phone": 0.99716,
+  "test_itw": 0.90197,
+  "test_asvspoof": 0.97086
+ },
+ "accuracy": {
+  "valid": 0.99443,
+  "test_indomain": 1.0,
+  "test_unseen_gen": 0.785,
+  "test_phone": 0.953,
+  "test_itw": 0.84395,
+  "test_asvspoof": 0.93045
+ },
+ "git_commit": "a65788d",
+ "clips": 8843
+}
