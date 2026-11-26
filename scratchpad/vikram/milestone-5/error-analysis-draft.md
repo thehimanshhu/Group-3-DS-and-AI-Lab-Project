@@ -37,4 +37,18 @@ F-03 reached 44.0% accuracy on unseen generators despite a ROC AUC of 0.959. Its
 - **Clip duration.** F-03 missed 1,490 of 2,158 In-the-Wild fakes under two seconds (69.0%), versus 1,626 of 3,516 at four to under eight seconds (46.2%). It flagged 35 of 5,032 real clips in the short bin and 1 of 4,502 in the longer bin. F-01 and F-02 also missed a larger share of fakes in the short bin, but unseen-generator fakes did not show a consistent direction across runs. Duration bins can mix recording conditions and generators; they do not isolate the effect of length.
 - **In-the-Wild speaker groups.** In anonymized group S02, F-03 missed 125 of 126 fakes and flagged none of 80 real clips. For S52, it missed 3 of 64 fakes and flagged none of 32 real clips. F-01 and F-02 showed the same contrast in misses. Speaker groups can also differ in recording conditions and how their fakes were made.
 
-Still to add: loudness or noise measurements, with processed-audio measurements labeled as proxies, and the paired F-03 onset experiment across the full test sets. The onset result will compare intact and trimmed EER on the same scoreable clips.
+Still to add: loudness or noise measurements. Measurements from normalized audio are proxies for the processed signal, not estimates of original recording loudness.
+
+### Sensitivity to removing the first second
+
+We removed the first second of the processed audio and rescored it with the same F-03 checkpoint and scoring settings. Each row compares trimmed and intact EER on the same clips. The 95% confidence intervals for the change use 1,000 paired bootstrap draws, resampling within each class. A positive change means EER increased after trimming.
+
+| Test set | Matched clips | Excluded real / fake | Intact EER | Trimmed EER | Change, pp (95% CI) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| In-domain | 6,000 | 0 / 0 | 0.000% | 0.033% | +0.033 (0.000 to 0.117) |
+| Phone channel | 6,000 | 0 / 0 | 0.083% | 0.067% | −0.017 (−0.083 to 0.133) |
+| Unseen generators | 8,639 | 0 / 0 | 9.800% | 10.132% | +0.332 (−0.263 to 0.864) |
+| In-the-Wild | 29,867 | 126 / 73 | 9.389% | 16.025% | +6.636 (6.233 to 7.080) |
+| ASVspoof | 66,809 | 104 / 677 | 8.384% | 15.497% | +7.113 (6.727 to 7.470) |
+
+The trim increased EER most on In-the-Wild and ASVspoof. The other three intervals included zero. We excluded 980 clips because fewer than 400 samples (25 ms at 16 kHz) remained after the cut. That leaves 117,315 paired clips. The result shows sensitivity to this cut, but it does not identify an onset cue: the cut also shortens the clip and changes the placement of scoring windows.
