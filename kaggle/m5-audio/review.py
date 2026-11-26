@@ -21,6 +21,20 @@ KEY = ["split", "clip_id"]
 BANDS = ["< -30 dB", "-30 to < -20 dB", "-20 to < -10 dB", ">= -10 dB"]
 
 
+def find_input(root, name):
+    """The single mounted folder called name, in either Kaggle layout."""
+    matches = (
+        sorted(root.glob(f"datasets/*/{name}"))
+        + sorted(root.glob(f"notebooks/*/{name}"))
+        + sorted(root.glob(name))
+    )
+    if len(matches) != 1:
+        raise FileNotFoundError(
+            f"Expected one mounted {name} under {root}; found {len(matches)}."
+        )
+    return matches[0]
+
+
 def select_cases(rows):
     """Take the strongest mistake per split, then three of each error type."""
     selected = []
@@ -155,9 +169,9 @@ def main():
     import torch
 
     inputs = Path("/kaggle/input")
-    data = inputs / "datasets/tarikasubhashhedaoo/dsai-group3-m4-data"
-    english = inputs / "notebooks/tarikasubhashhedaoo/dsai-group3-m5-full-tests-en"
-    score_root = inputs / "notebooks/viknegi/dsai-group3-m5-score-vikram"
+    data = find_input(inputs, "dsai-group3-m4-data")
+    english = find_input(inputs, "dsai-group3-m5-full-tests-en")
+    score_root = find_input(inputs, "dsai-group3-m5-score-vikram")
     (prediction_path,) = score_root.rglob("predictions_full.csv.gz")
     manifest_path = data / "manifests/manifest_m4.csv"
     for path, expected in (
@@ -204,7 +218,7 @@ def main():
 
         cfg = run_config("F-03")
         checkpoint = find_checkpoint(
-            "F-03", [inputs / "notebooks/viknegi/m4-training-notebook-3"]
+            "F-03", [find_input(inputs, "m4-training-notebook-3")]
         )
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = load_model(checkpoint, cfg, device)

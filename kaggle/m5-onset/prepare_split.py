@@ -46,6 +46,20 @@ INTACT_COMMIT = "1756e7e4b9a1f0320e664c34f0901648f5fc0880"
 MANIFEST_SHA256 = "35826f269b44f83afd914342c16190f2f69c75f0127af8fbf2475bd9995412c8"
 
 
+def find_input(root, name):
+    """The single mounted folder called name, in either Kaggle layout."""
+    matches = (
+        sorted(root.glob(f"datasets/*/{name}"))
+        + sorted(root.glob(f"notebooks/*/{name}"))
+        + sorted(root.glob(name))
+    )
+    if len(matches) != 1:
+        raise FileNotFoundError(
+            f"Expected one mounted {name} under {root}; found {len(matches)}."
+        )
+    return matches[0]
+
+
 def stage_split(data_roots, split, stage):
     from src.dataset import read_manifest
     from src.score import resolve_paths, run_config
@@ -111,8 +125,8 @@ def stage_split(data_roots, split, stage):
 
 def score_full_on_kaggle():
     inputs = Path("/kaggle/input")
-    data = inputs / "datasets/tarikasubhashhedaoo/dsai-group3-m4-data"
-    english = inputs / "notebooks/tarikasubhashhedaoo/dsai-group3-m5-full-tests-en"
+    data = find_input(inputs, "dsai-group3-m4-data")
+    english = find_input(inputs, "dsai-group3-m5-full-tests-en")
     manifest = data / "manifests/manifest_m4.csv"
     if (
         not english.is_dir()
@@ -206,7 +220,11 @@ def main():
 
 
 if __name__ == "__main__":
-    if Path("/kaggle/input").is_dir() and "--stage" not in sys.argv:
+    local = any(
+        a in ("-h", "--help") or a == "--stage" or a.startswith("--stage=")
+        for a in sys.argv[1:]
+    )
+    if Path("/kaggle/input").is_dir() and not local:
         score_full_on_kaggle()
     else:
         main()
