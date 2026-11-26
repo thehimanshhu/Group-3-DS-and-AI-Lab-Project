@@ -433,23 +433,11 @@ The ASVspoof target came from published systems trained on the full ASVspoof tra
 | --- | --- |
 | Seed variation and multiple comparisons in the sweeps | Section 4.2 (seed spread on the full sets) and Section 4.3 (Holm correction, sweep checkpoints on test) |
 | A persistent release of weights and data | Section 2.3: weights of all final and baseline models and the full manifest on the Hugging Face Hub; audio rebuilt from pinned public sources |
-| AI usage disclosure | Section 10 |
+| AI usage disclosure | [`AI-usage-disclosure.md`](../../AI-usage-disclosure.md) |
 
 ---
 
-## 10. AI Usage Disclosure
-
-An AI coding assistant (Claude, Anthropic) was used during this milestone for:
-
-- **Code:** the faster scoring code (window batching, fp16, worker processes), the multi-folder and onset options of `src/score.py`, the comparison and Holm-correction helpers, the full-test-set build scripts for Kaggle, and parts of the analysis notebooks.
-- **Analysis:** drafting the statistical checks (paired bootstrap, Holm correction, calibration) and the tables in the notebooks.
-- **Writing:** first drafts and editing of report sections, the model card and commit messages.
-
-Every result in this report comes from code run on our data, and the outputs are saved in the notebooks. The team checked the assistant's work as follows: new code has unit tests (for example, batched scores must match clip-by-clip scores within 1e-5, and the trimmed-clip scores must match scoring the trimmed audio directly); the sped-up scorer was compared clip by clip with the Milestone-4 predictions before use; every downloaded checkpoint was checked against stored scores; the numbers in the text were checked against the notebook outputs; and design decisions, interpretations and the final text were reviewed by the team.
-
----
-
-## 11. Artifacts
+## 10. Artifacts
 
 | Artifact | Location |
 | --- | --- |
@@ -466,7 +454,7 @@ Every result in this report comes from code run on our data, and the outputs are
 
 ---
 
-## 12. References
+## 11. References
 
 1. Babu, A., Wang, C., Tjandra, A., et al. (2021). _XLS-R: Self-supervised Cross-lingual Speech Representation Learning at Scale_. arXiv. <https://arxiv.org/abs/2111.09296>
 2. Jung, J., Heo, H. S., Tak, H., et al. (2022). _AASIST: Audio Anti-Spoofing using Integrated Spectro-Temporal Graph Attention Networks_. ICASSP 2022. <https://arxiv.org/abs/2110.01200>
