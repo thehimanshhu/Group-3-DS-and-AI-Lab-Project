@@ -1,6 +1,6 @@
 # Qualitative results
 
-**Setup.** F-03 (final config, seed 44) scored the five full test sets: 118,295 test clips plus `valid` (3,952), with `python -m src.score F-03 --full`, scorer commit `1756e7e`, on Kaggle 2 × T4. The decision threshold `0.95927` is the EER point of `valid`. Predictions are in `results/F-03/predictions_full.csv.gz`; the selection, tables, and checks are in `notebooks/Milestone-5/error_analysis.ipynb`. The six listening clips and their saliency plots stay in the private Kaggle output (`viknegi/dsai-group3-m5-audio-vikram`, `audio_review/`); no audio is committed.
+**Setup.** F-03 (final config, seed 44) scored the five full test sets: 118,295 test clips plus `valid` (3,952), with `python -m src.score F-03 --full`, scorer commit `1756e7e`, on Kaggle 2 × T4. The decision threshold `0.95927` is the EER point of `valid`. Predictions are in `results/F-03/predictions_full.csv.gz`; the selection, tables, and checks are in `notebooks/Milestone-5/error_analysis.ipynb`. The six listening clips and their saliency plots stay in the private Kaggle output (`audio_review/`); no audio is committed.
 
 ## Sample outputs per test set
 

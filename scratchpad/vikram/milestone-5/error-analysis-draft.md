@@ -43,7 +43,7 @@ This is one listener’s account, not a controlled perceptual test. The page sho
 | In-the-Wild | 6,230 / 11,244 (55.41%) | 43 / 18,822 (0.23%) |
 | ASVspoof | 16,191 / 60,665 (26.69%) | 4 / 6,925 (0.06%) |
 
-F-03 reached 44.0% accuracy on unseen generators despite a ROC AUC of 0.959. Its scores separated the classes better than the accuracy at the validation threshold suggests: the threshold missed 74.7% of the fakes without flagging any real clips. The same pattern holds for F-01 and F-02, which missed 4,325 and 3,414 of the 6,479 fakes, respectively, and flagged none of the 2,160 real clips. In-the-Wild was also hard for F-03: it missed more than half the fakes while flagging fewer than 1% of the real clips.
+F-03 reached 44.0% accuracy on unseen generators despite a ROC AUC of 0.959. Its scores separated the classes better than the accuracy at the validation threshold suggests: the threshold missed 74.7% of the fakes (95% CI 73.7–75.8%) without flagging any real clips. The same pattern holds for F-01 and F-02, which missed 4,325 and 3,414 of the 6,479 fakes, respectively, and flagged none of the 2,160 real clips. In-the-Wild was also hard for F-03: it missed 55.4% of the fakes (54.6–56.4%) while flagging fewer than 1% of the real clips. Intervals resample fake clips within each split (2,000 draws).
 
 ### Where errors concentrate
 
@@ -54,7 +54,7 @@ F-03 reached 44.0% accuracy on unseen generators despite a ROC AUC of 0.959. Its
 
 ### Quiet-frame energy
 
-For every processed test clip, we measured the 10th percentile of 20 ms frame power relative to the clip’s mean frame power, in dB. Lower values mean the quiet frames are far below the rest of that clip. This is a proxy computed after preprocessing (which normalizes each clip to −20 dBFS): it describes pauses and signal dynamics, not original loudness or background noise, and the generator or recording conditions can confound it.
+For every processed test clip, we measured the 10th percentile of 20 ms frame power relative to the clip’s mean frame power, in dB. Lower values mean the quiet frames are far below the rest of that clip. This is a proxy computed after preprocessing (which normalizes each clip to −20 dBFS): it describes pauses and signal dynamics, not original loudness or background noise, and the generator or recording conditions can confound it. Original-recording loudness was not assessed: the full test sets are distributed only as processed, loudness-normalised audio.
 
 | Test set | True label | < −30 dB | −30 to < −20 dB | −20 to < −10 dB | ≥ −10 dB |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -82,4 +82,4 @@ The trim increased EER most on In-the-Wild and ASVspoof. The other three interva
 
 ### Remaining handoff
 
-The private review page and saliency images stay in Kaggle. The compiled report needs these sections merged with the quantitative benchmark tables (Amit) and the configuration and seed analysis (Tarika).
+The private review page and saliency images stay in Kaggle. The compiled report needs these sections merged with the quantitative benchmark tables (Amit) and the configuration and seed analysis (Tarika). Threshold choice and calibration are assessed in the operating-point section.
